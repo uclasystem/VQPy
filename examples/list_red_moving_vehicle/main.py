@@ -16,7 +16,10 @@ def make_parser():
         default=None,
         help="the folder to save the final result",
     )
-    parser.add_argument("-y", "--yolox_model_path", help="path to yolox pretrained model")
+    parser.add_argument(
+        "-y",
+        "--yolox_model_path",
+        help="path to yolox pretrained model")
     return parser
 
 
