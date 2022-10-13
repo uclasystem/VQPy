@@ -19,11 +19,11 @@ class YOLOXDetector(DetectorBase):
     cls_names = COCO_CLASSES
     output_fields = ["tlbr", "score", "class_id"]
 
-    def __init__(self, device="gpu", fp16=True):
+    def __init__(self, device="gpu", fp16=True, code_path="../yolo", model_path="../yolo/pretrained/yolox_x.pth"):
         # TODO: start a new process handling this
 
         import sys
-        sys.path.append("./models/yolo")
+        sys.path.append(code_path)
 
         from models.yolo.yolox.data.data_augment import ValTransform
         from models.yolo.yolox.exp.build import get_exp
@@ -44,7 +44,7 @@ class YOLOXDetector(DetectorBase):
         model.eval()
 
         logger.info("loading checkpoint")
-        ckpt = torch.load("models/yolo/pretrained/yolox_x.pth",
+        ckpt = torch.load(model_path,
                           map_location="cpu")
         model.load_state_dict(ckpt["model"])
         logger.info("loaded checkpoint done.")
