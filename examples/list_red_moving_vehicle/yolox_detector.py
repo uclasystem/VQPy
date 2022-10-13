@@ -8,89 +8,85 @@ from typing import Dict, List
 import numpy as np
 import torch
 from loguru import logger
-from ..base.detector import DetectorBase
-from ..utils.classes import COCO_CLASSES
-from .logger import register
+from vqpy.base.detector import DetectorBase
+from vqpy.utils.classes import COCO_CLASSES
+from vqpy.detector.logger import register
+
+from yolox.data.data_augment import ValTransform
+from yolox.exp.build import get_exp
+from yolox.utils import postprocess
+from yolox.utils.model_utils import get_model_info
 
 
-class YOLOXDetector(DetectorBase):
-    """The YOLOX detector for object detection"""
+def generate_register_yolox_detector(model_path=None):
 
-    cls_names = COCO_CLASSES
-    output_fields = ["tlbr", "score", "class_id"]
+    class YOLOXDetector(DetectorBase):
+        """The YOLOX detector for object detection"""
 
-    def __init__(self, device="gpu", fp16=True, code_path="../yolo", model_path="../yolo/pretrained/yolox_x.pth"):
-        # TODO: start a new process handling this
+        cls_names = COCO_CLASSES
+        output_fields = ["tlbr", "score", "class_id"]
 
-        import sys
-        sys.path.append(code_path)
+        def __init__(self, device="gpu", fp16=True):
+            # TODO: start a new process handling this
+            exp = get_exp(None, "yolox_x")
+            exp.test_conf = 0.3
+            exp.nmsthre = 0.3
+            exp.test_size = (640, 640)
 
-        from models.yolo.yolox.data.data_augment import ValTransform
-        from models.yolo.yolox.exp.build import get_exp
-        from models.yolo.yolox.utils import postprocess
-        from models.yolo.yolox.utils.model_utils import get_model_info
+            model = exp.get_model()
+            logger.info(f"Model Summary: {get_model_info(model, exp.test_size)}")
+            if device == 'gpu':
+                model.cuda()
+                if fp16:
+                    model.half()
+            model.eval()
 
-        exp = get_exp(None, "yolox_x")
-        exp.test_conf = 0.3
-        exp.nmsthre = 0.3
-        exp.test_size = (640, 640)
+            logger.info("loading checkpoint")
+            ckpt = torch.load(model_path,
+                            map_location="cpu")
+            model.load_state_dict(ckpt["model"])
+            logger.info("loaded checkpoint done.")
 
-        model = exp.get_model()
-        logger.info(f"Model Summary: {get_model_info(model, exp.test_size)}")
-        if device == 'gpu':
-            model.cuda()
-            if fp16:
-                model.half()
-        model.eval()
+            self.model = model
+            self.num_classes = exp.num_classes
+            self.confthre = exp.test_conf
+            self.nmsthre = exp.nmsthre
+            self.test_size = exp.test_size
+            self.device = device
+            self.fp16 = fp16
+            self.preproc = ValTransform(legacy=False)
+            self.postproc = postprocess
 
-        logger.info("loading checkpoint")
-        ckpt = torch.load(model_path,
-                          map_location="cpu")
-        model.load_state_dict(ckpt["model"])
-        logger.info("loaded checkpoint done.")
+        def inference(self, img) -> List[Dict]:
+            ratio = min(self.test_size[0] / img.shape[0],
+                        self.test_size[1] / img.shape[1])
 
-        self.model = model
-        self.num_classes = exp.num_classes
-        self.confthre = exp.test_conf
-        self.nmsthre = exp.nmsthre
-        self.test_size = exp.test_size
-        self.device = device
-        self.fp16 = fp16
-        self.preproc = ValTransform(legacy=False)
-        self.postproc = postprocess
+            img, _ = self.preproc(img, None, self.test_size)
+            img = torch.from_numpy(img).unsqueeze(0)
+            img = img.float()
+            if self.device == "gpu":
+                img = img.cuda()
+                if self.fp16:
+                    img = img.half()  # to FP16
 
-    def inference(self, img) -> List[Dict]:
-        ratio = min(self.test_size[0] / img.shape[0],
-                    self.test_size[1] / img.shape[1])
+            with torch.no_grad():
+                outputs = self.model(img)
+                outputs = self.postproc(
+                    outputs, self.num_classes, self.confthre,
+                    self.nmsthre, class_agnostic=True
+                )
 
-        img, _ = self.preproc(img, None, self.test_size)
-        img = torch.from_numpy(img).unsqueeze(0)
-        img = img.float()
-        if self.device == "gpu":
-            img = img.cuda()
-            if self.fp16:
-                img = img.half()  # to FP16
+            outputs = outputs[0]
+            if outputs is None:
+                return []
+            bboxes = (outputs[:, 0:4] / ratio).cpu()
+            scores = (outputs[:, 4:5] * outputs[:, 5:6]).cpu()
+            cls = outputs[:, 6:7].cpu()
 
-        with torch.no_grad():
-            outputs = self.model(img)
-            outputs = self.postproc(
-                outputs, self.num_classes, self.confthre,
-                self.nmsthre, class_agnostic=True
-            )
-
-        outputs = outputs[0]
-        if outputs is None:
-            return []
-        bboxes = (outputs[:, 0:4] / ratio).cpu()
-        scores = (outputs[:, 4:5] * outputs[:, 5:6]).cpu()
-        cls = outputs[:, 6:7].cpu()
-
-        rets = []
-        for (tlbr, score, class_id) in zip(bboxes, scores, cls):
-            rets.append({"tlbr": np.asarray(tlbr),
-                         "score": score.item(),
-                         "class_id": int(class_id.item())})
-        return rets
-
-
-register(YOLOXDetector)
+            rets = []
+            for (tlbr, score, class_id) in zip(bboxes, scores, cls):
+                rets.append({"tlbr": np.asarray(tlbr),
+                            "score": score.item(),
+                            "class_id": int(class_id.item())})
+            return rets
+    register(YOLOXDetector)
