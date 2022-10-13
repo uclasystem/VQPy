@@ -34,7 +34,8 @@ def generate_register_yolox_detector(model_path=None):
             exp.test_size = (640, 640)
 
             model = exp.get_model()
-            logger.info(f"Model Summary: {get_model_info(model, exp.test_size)}")
+            model_info = get_model_info(model, exp.test_size)
+            logger.info(f"Model Summary: {model_info}")
             if device == 'gpu':
                 model.cuda()
                 if fp16:
@@ -42,8 +43,7 @@ def generate_register_yolox_detector(model_path=None):
             model.eval()
 
             logger.info("loading checkpoint")
-            ckpt = torch.load(model_path,
-                            map_location="cpu")
+            ckpt = torch.load(model_path, map_location="cpu")
             model.load_state_dict(ckpt["model"])
             logger.info("loaded checkpoint done.")
 
@@ -86,7 +86,7 @@ def generate_register_yolox_detector(model_path=None):
             rets = []
             for (tlbr, score, class_id) in zip(bboxes, scores, cls):
                 rets.append({"tlbr": np.asarray(tlbr),
-                            "score": score.item(),
-                            "class_id": int(class_id.item())})
+                             "score": score.item(),
+                             "class_id": int(class_id.item())})
             return rets
     register(YOLOXDetector)
