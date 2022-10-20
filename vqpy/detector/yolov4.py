@@ -84,7 +84,7 @@ def postprocess(detections, image_size):
         pred_coor = np.concatenate([pred_xywh[:, :2] - pred_xywh[:, 2:] * 0.5,
                                     pred_xywh[:, :2] + pred_xywh[:, 2:] * 0.5],
                                    axis=-1)
-        # # (2) (xmin, ymin, xmax, ymax) -> 
+        # # (2) (xmin, ymin, xmax, ymax) ->
         # # (xmin_org, ymin_org, xmax_org, ymax_org)
         org_h, org_w = org_img_shape[0], org_img_shape[1]
         ih, iw = MODEL_INPUT_SIZE
