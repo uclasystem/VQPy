@@ -59,8 +59,8 @@ def postprocess(detections, image_size):
         # todo: convert dict to named tuple
         rets.append({"tlbr": np.asarray(tlbr),
                      "score": score.item(),
-                     "class_id": class_id})
-        return rets
+                     "class_id": class_id - 1})
+    return rets
 
 
 register("faster_rcnn", FasterRCNNDdetector, "FasterRCNN-10.onnx")
