@@ -16,7 +16,7 @@ import os
 input_width = 512
 input_height = 384  # use hybridnets_384x512.onnx, hard code size for now
 output_names = ["regression", "classification", "segmentation"]
-anchor_name = "SpecCar_anchors.npy"
+anchor_name = "anchors_384x512.npy"
 conf_thres = 0.5
 iou_thres = 0.5
 
@@ -136,4 +136,4 @@ def iou_np(box, boxes, area, areas):
     return iou_np
 
 
-register("spec_car", SpecCarDetector, "SpecCar.onnx")
+register("spec_car", SpecCarDetector, "hybridnets_384x512.onnx")

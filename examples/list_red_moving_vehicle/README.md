@@ -13,6 +13,8 @@ pip3 install -v -e .
 wget https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_x.pth
 ```
 
+Pretrained onnx model for the specific car detector can be found [here](https://github.com/PINTO0309/PINTO_model_zoo/tree/main/276_HybridNets), the `hybridnets_384x512` model and anchors are used.
+
 Besides, please use below command to install other dependencies for this example.
 ```
 pip install webcolors ColorDetect opencv-python
