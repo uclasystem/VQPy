@@ -29,7 +29,8 @@ class SpecCarDetector(DetectorBase):
 
     def inference(self, img: np.ndarray) -> List[Dict]:
         # TODO: allow loading multiple files from "model_path"
-        anchor_path = os.path.join(os.path.dirname(self.model_path), anchor_name)
+        anchor_path = os.path.join(os.path.dirname(self.model_path),
+                                   anchor_name)
         processed_img = preprocess(img)
         detections = onnx_inference(processed_img, self.model_path)
         outputs = postprocess(detections, img.shape, anchor_path)
@@ -71,7 +72,9 @@ def postprocess(detections, image_size, anchor_path):
     rets = []
     for (tlbr, score) in zip(filtered_boxes, filtered_scores):
         # todo: convert dict to named tuple
-        rets.append({"tlbr": tlbr, "score": score, "class_id": 2})  # class_id for car
+        rets.append(
+            {"tlbr": tlbr, "score": score, "class_id": 2}   # class_id for car
+        )
     return rets
 
 
@@ -97,7 +100,8 @@ def transform_boxes(boxes, anchors):
 
 # Ref: https://python-ai-learn.com/2021/02/14/nmsfast/
 def nms_fast(bboxes, scores, iou_threshold=0.5):
-    areas = (bboxes[:, 2] - bboxes[:, 0] + 1) * (bboxes[:, 3] - bboxes[:, 1] + 1)
+    areas = (bboxes[:, 2] - bboxes[:, 0] + 1) * \
+        (bboxes[:, 3] - bboxes[:, 1] + 1)
 
     sort_index = np.argsort(scores)
 
@@ -108,7 +112,8 @@ def nms_fast(bboxes, scores, iou_threshold=0.5):
         ind_list = sort_index[:i]
 
         iou = iou_np(
-            bboxes[max_scr_ind], bboxes[ind_list], areas[max_scr_ind], areas[ind_list]
+            bboxes[max_scr_ind], bboxes[ind_list],
+            areas[max_scr_ind], areas[ind_list]
         )
 
         del_index = np.where(iou >= iou_threshold)
