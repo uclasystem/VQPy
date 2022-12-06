@@ -15,6 +15,7 @@ from .function.logger import vqpy_func_logger  # noqa: F401
 from .impl.multiclass_tracker import MultiTracker
 from .impl.vobj_base import VObjBase
 from .impl.vobj_constraint import VObjConstraint  # noqa: F401
+from .base.interface import OutputConfig  # noqa: F401
 from .tracker import setup_ground_tracker
 from .utils.classes import COCO_CLASSES  # noqa: F401
 from .utils.video import FrameStream

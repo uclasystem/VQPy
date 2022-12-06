@@ -28,6 +28,10 @@ class Person(vqpy.VObjBase):
 class PersonOnCrosswalk(vqpy.QueryBase):
 
     @staticmethod
+    def set_output_configs() -> vqpy.OutputConfig:
+        return vqpy.OutputConfig(output_frame_vobj_num=True)
+
+    @staticmethod
     def setting() -> vqpy.VObjConstraint:
 
         CROSSWALK_REGION_1 = [(731, 554), (963, 564), (436, 1076), (14, 1076)]
@@ -43,8 +47,6 @@ class PersonOnCrosswalk(vqpy.QueryBase):
         def on_crosswalk(tlbr):
             from shapely.geometry import Point, Polygon
             bottom_central_point = get_bottom_central_point(tlbr)
-            # print(f"tlbr is {tlbr}")
-            # print(f"bottom central_point {bottom_central_point}")
             point = Point(bottom_central_point)
             for region in CROSSWALK_REGIONS:
                 poly = Polygon(region)
