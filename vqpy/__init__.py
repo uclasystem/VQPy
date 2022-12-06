@@ -66,7 +66,7 @@ def launch(cls_name,
                 os.makedirs(save_folder, exist_ok=True)
             for task in tasks:
                 task_name = task.get_setting().filename
-                filename = video_name + '_' + task_name + '_' + detector_name + '.json'
+                filename = f"{video_name}_{task_name}_{detector_name}.json"
                 save_path = os.path.join(save_folder, filename)
                 with open(save_path, 'w') as f:
                     json.dump(task.vqpy_getdata(), f)

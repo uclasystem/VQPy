@@ -1,7 +1,5 @@
 import argparse
-import numpy as np
 import vqpy
-from vqpy.function.logger import vqpy_func_logger
 from yolox_detector import YOLOXDetector
 from vqpy.detector.logger import register
 
