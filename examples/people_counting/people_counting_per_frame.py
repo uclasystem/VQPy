@@ -27,7 +27,10 @@ class PersonOnCrosswalk(vqpy.QueryBase):
 
     @staticmethod
     def set_output_configs() -> vqpy.OutputConfig:
-        return vqpy.OutputConfig(output_frame_vobj_num=True)
+        return vqpy.OutputConfig(
+            # output_frame_vobj_num=True,
+            output_total_vobj_num=True
+            )
 
     @staticmethod
     def setting() -> vqpy.VObjConstraint:
