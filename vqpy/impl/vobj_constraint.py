@@ -2,15 +2,18 @@ from __future__ import annotations
 
 from typing import Callable, Dict, List, Optional
 from ..base.interface import VObjBaseInterface, VObjConstraintInterface
+from ..utils.filters import lasting
 
 
 class VObjConstraint(VObjConstraintInterface):
     """The constraint on VObj instances, helpful when applying queries"""
 
-    def __init__(self,
-                 filter_cons: Dict[str, Optional[Callable]] = {},
-                 select_cons: Dict[str, Optional[Callable]] = {},
-                 filename: str = "data"):
+    def __init__(
+        self,
+        filter_cons: Dict[str, Optional[Callable]] = {},
+        select_cons: Dict[str, Optional[Callable]] = {},
+        filename: str = "data",
+    ):
         """Initialize a VObj constraint instances
 
         filter_cons (Dict[str, Optional[Callable]], optional):
@@ -49,10 +52,13 @@ class VObjConstraint(VObjConstraintInterface):
         for obj in objs:
             ok = True
             for item, func in self.filter_cons.items():
-                it = obj.getv(item)
-                if it is None or not func(it):
-                    ok = False
-                    break
+                if type(func) == lasting:
+                    ok = func(obj, item)
+                else:
+                    it = obj.getv(item)
+                    if it is None or not func(it):
+                        ok = False
+                        break
             if ok:
                 ret.append(obj)
         return ret
