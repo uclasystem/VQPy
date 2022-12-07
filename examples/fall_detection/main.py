@@ -1,5 +1,4 @@
 import vqpy
-from vqpy.function.logger import vqpy_func_logger
 from yolox_detector import YOLOXDetector
 from vqpy.detector.logger import register
 
@@ -38,7 +37,8 @@ class Person(vqpy.VObjBase):
     @vqpy.property()
     @vqpy.stateful(30)
     def keypoints(self):
-        # per-frame property, but tracker can return objects not in the current frame
+        # per-frame property, but tracker can return objects
+        # not in the current frame
         image = self._ctx.frame
         if self.getv('tlbr') is None:
             return None

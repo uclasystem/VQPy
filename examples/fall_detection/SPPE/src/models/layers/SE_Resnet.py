@@ -1,3 +1,4 @@
+# flake8: noqa
 import torch.nn as nn
 from .SE_module import SELayer
 import torch.nn.functional as F

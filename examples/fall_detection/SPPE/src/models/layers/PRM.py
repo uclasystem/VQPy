@@ -1,3 +1,4 @@
+# flake8: noqa
 import torch.nn as nn
 from .util_models import ConcatTable, CaddTable, Identity
 import math

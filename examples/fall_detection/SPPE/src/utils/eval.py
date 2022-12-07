@@ -1,3 +1,4 @@
+# flake8: noqa
 from SPPE.src.opt import opt
 try:
     from utils import transformBoxInvert, transformBoxInvert_batch, findPeak, processPeaks

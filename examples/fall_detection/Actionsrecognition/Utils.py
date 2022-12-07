@@ -1,3 +1,4 @@
+# flake8: noqa
 ### Reference from: https://github.com/yysijie/st-gcn/blob/master/net/utils/graph.py
 
 import os

@@ -1,3 +1,4 @@
+# flake8: noqa
 import torch.nn as nn
 from .layers.PRM import Residual as ResidualPyramid
 from .layers.Residual import Residual as Residual

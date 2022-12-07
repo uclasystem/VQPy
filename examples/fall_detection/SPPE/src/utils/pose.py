@@ -1,3 +1,4 @@
+# flake8: noqa
 from utils import (load_image, drawGaussian, drawBigCircle, drawSmallCircle, cv_rotate,
                    cropBox, transformBox, flip, shuffleLR, drawCOCO)
 from utils import getPrediction
