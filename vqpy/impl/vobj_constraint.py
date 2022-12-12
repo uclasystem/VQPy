@@ -35,12 +35,19 @@ class VObjConstraint(VObjConstraintInterface):
     def __add__(self, other: VObjConstraint) -> VObjConstraint:
         """merge constraints in the form subclass + superclass"""
         filter_cons = self.filter_cons
-        ret = VObjConstraint(filter_cons, self.select_cons, self.filename)
+        select_cons = self.select_cons
+        # merge filter constraints
         for key, cond in other.filter_cons.items():
-            if key in ret.filter_cons:
+            if key in filter_cons:
                 filter_cons[key] = lambda x: filter_cons[key](x) and cond(x)
             else:
                 filter_cons[key] = cond
+        # prioritize select constraints in derived class, which is 'self'
+        # i.e. only add select constraints if not yet in self.select_cons
+        for key, postproc in other.select_cons.items():
+            if key not in select_cons:
+                select_cons[key] = postproc
+        ret = VObjConstraint(filter_cons, select_cons, self.filename)
         return ret
 
     def filter(self, objs: List[VObjBaseInterface]) -> List[VObjBaseInterface]:
