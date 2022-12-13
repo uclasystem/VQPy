@@ -5,4 +5,4 @@ some of the VQPy functions.
 """
 
 from .filters import lasting  # noqa: F401
-from .predicate_funcs import within_regions # noqa: F401
+from .predicate_funcs import within_regions  # noqa: F401
