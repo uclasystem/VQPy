@@ -58,6 +58,8 @@ class People_loitering_query(vqpy.QueryBase):
         select_cons = {
             "coordinate_center": None,
             "track_id": None,
+            # name in vqpy.lasting + '_time_periods' stored in VObj
+            # can be accessed by getv, be used in select_cons, etc.
             "in_roi_time_periods": None,
         }
         return vqpy.VObjConstraint(

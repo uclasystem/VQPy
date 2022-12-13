@@ -52,6 +52,8 @@ class VObjConstraint(VObjConstraintInterface):
         for obj in objs:
             ok = True
             for item, func in self.filter_cons.items():
+                # patch to support vqpy.lasting since it's the object needs to
+                # be passed as an argument
                 if type(func) == lasting:
                     ok = func(obj, item)
                 else:
