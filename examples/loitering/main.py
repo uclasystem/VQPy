@@ -37,17 +37,17 @@ class People_loitering_query(vqpy.QueryBase):
 
         filter_cons = {
             "__class__": lambda x: x == Person,
-            "bottom_center": vqpy.utils.lasting(
-                trigger=vqpy.utils.within_regions(REGIONS),
-                time=10, name="in_roi"
+            "bottom_center": vqpy.utils.continuing(
+                condition=vqpy.utils.within_regions(REGIONS),
+                duration=10, name="in_roi"
             ),
         }
         select_cons = {
             "coordinate_center": None,
             "track_id": None,
-            # name in vqpy.lasting + '_time_periods' stored in VObj
+            # name in vqpy.continuing + '_duration' stored in VObj
             # can be accessed by getv, be used in select_cons, etc.
-            "in_roi_time_periods": None,
+            "in_roi_duration": None,
         }
         return vqpy.VObjConstraint(
             filter_cons, select_cons, filename="loitering"

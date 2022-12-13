@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Callable, Dict, List, Optional
 from ..base.interface import VObjBaseInterface, VObjConstraintInterface
-from ..utils.filters import lasting
+from ..utils.filters import continuing
 
 
 class VObjConstraint(VObjConstraintInterface):
@@ -52,9 +52,9 @@ class VObjConstraint(VObjConstraintInterface):
         for obj in objs:
             ok = True
             for item, func in self.filter_cons.items():
-                # patch to support vqpy.lasting since it's the object needs to
+                # patch to support vqpy.utils.continuing since the object needs to
                 # be passed as an argument
-                if type(func) == lasting:
+                if type(func) == continuing:
                     ok = func(obj, item)
                 else:
                     it = obj.getv(item)
