@@ -52,8 +52,8 @@ class VObjConstraint(VObjConstraintInterface):
         for obj in objs:
             ok = True
             for item, func in self.filter_cons.items():
-                # patch to support vqpy.utils.continuing since the object needs to
-                # be passed as an argument
+                # patch to support vqpy.utils.continuing since the object
+                # needs to be passed as an argument
                 if type(func) == continuing:
                     ok = func(obj, item)
                 else:
