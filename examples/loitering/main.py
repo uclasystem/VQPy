@@ -51,7 +51,7 @@ class People_loitering_query(vqpy.QueryBase):
 
         filter_cons = {
             "__class__": lambda x: x == Person,
-            "tlbr": vqpy.lasting(
+            "tlbr": vqpy.utils.lasting(
                 trigger=in_region_of_interest, time=10, name="in_roi"
             ),
         }
