@@ -20,11 +20,7 @@ def make_parser():
 
 
 class Person(vqpy.VObjBase):
-    @vqpy.property()
-    def coordinate_center(self):
-        tlbr = self.getv("tlbr")
-        if tlbr is not None:
-            return str((tlbr[:2] + tlbr[2:]) / 2)
+    pass
 
 
 class People_loitering_query(vqpy.QueryBase):
@@ -43,7 +39,8 @@ class People_loitering_query(vqpy.QueryBase):
             ),
         }
         select_cons = {
-            "coordinate_center": None,
+            "coordinate": lambda x: str(x),  # convert to string for
+                                             # JSON serialization
             "track_id": None,
             # name in vqpy.continuing + '_duration' stored in VObj
             # can be accessed by getv, be used in select_cons, etc.

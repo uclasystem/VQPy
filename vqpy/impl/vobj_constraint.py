@@ -51,13 +51,13 @@ class VObjConstraint(VObjConstraintInterface):
         ret: List[VObjBaseInterface] = []
         for obj in objs:
             ok = True
-            for item, func in self.filter_cons.items():
+            for property, func in self.filter_cons.items():
                 # patch to support vqpy.utils.continuing since the object
                 # needs to be passed as an argument
                 if type(func) == continuing:
-                    ok = func(obj, item)
+                    ok = func(obj, property)
                 else:
-                    it = obj.getv(item)
+                    it = obj.getv(property)
                     if it is None or not func(it):
                         ok = False
                         break

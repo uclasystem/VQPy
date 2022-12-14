@@ -1,11 +1,23 @@
 class continuing:
-    """A filter constraint that checks if the condition on property
-    is True for a certain duration
+    """Checks whether the condition function continues to be true
+    for a certain duration.
 
-    Returns True if the condition on `property` is True for the given
-    duration, with duration being counted accumulatively.
-    Attribute with name `property`_duration is used to store the
-    cumulative duration of condition being met.
+    Returns True if the `condition` function on `property` is True
+    for the given duration, with duration being counted accumulatively.
+
+    Cumulative duration (in number of frames) of condition being met
+    will be stored in VObj as a property, with name given by `name`
+    parameter as `f"{name}_duration"`. This property can be accessed
+    with getv, be used in select_cons, etc.
+
+    Attributes:
+    ----------
+    condition: func(property) -> bool
+        Condition function to be checked.
+    duration: int
+        Duration in seconds.
+    name: str
+        Name of the attribute to store the duration.
     """
 
     def __init__(self, condition, duration, name):
@@ -14,8 +26,8 @@ class continuing:
         # use name given as property name of duration
         self.name = f"{name}_duration"
 
-    def __call__(self, obj, item):
-        if self.condition(obj.getv(item)):
+    def __call__(self, obj, property):
+        if self.condition(obj.getv(property)):
             # increment duration if `condition` returns True
             found = False
             # check frames from the last to the first
