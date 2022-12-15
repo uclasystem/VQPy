@@ -2,13 +2,15 @@ class continuing:
     """Checks whether the condition function continues to be true
     for a certain duration.
 
-    Returns True if the `condition` function on `property` is True
-    for the given duration, with duration being counted accumulatively.
+    Returns True if the `condition` function on Vobj's property with name
+    `property_name` is satisfied continuously for time interval greater than
+    the given duration.
 
-    Cumulative duration (in number of frames) of condition being met
-    will be stored in VObj as a property, with name given by `name`
-    parameter as `f"{name}_duration"`. This property can be accessed
-    with getv, be used in select_cons, etc.
+    Time periods of condition being met will be stored in VObj as a property
+    with name of `f"{name}_periods"`, in format of a list of tuples `(start,
+    end)`, where `start` and `end` are time relative to the start of video, in
+    seconds. This property can be accessed with getv, be used in select_cons,
+    etc.
 
     Attributes:
     ----------
@@ -17,22 +19,25 @@ class continuing:
     duration: int
         Duration in seconds.
     name: str
-        Name of the attribute to store the duration.
+        Name of the attribute to store the time periods.
+    property_name: str
+        Specified in key of VObjConstraint's filter_cons, name of the property
+        to be checked.
     """
 
     def __init__(self, condition, duration, name):
         self.condition = condition
         self.duration = duration
-        # use name given as property name of duration
+        # use name given as property name of time periods
         self.name = name
 
-    def __call__(self, obj, property):
+    def __call__(self, obj, property_name):
         cur_frame = obj._ctx.frame_id
-        # threshold should be set to the same as tracker's threshold of
-        # marking track as lost
-        # Currently set to equal ByteTrack's
+        # threshold should be set to the same as tracker's threshold of marking
+        # track as lost
+        # Currently set to equal ByteTrack's threshold
         threshold = int(obj._ctx.fps / 30.0 * 30)
-        if self.condition(obj.getv(property)):
+        if self.condition(obj.getv(property_name)):
             # get the start and end of the potentially continuing period
             period_start = obj.getv(f"{self.name}_start")
             period_end = obj.getv(f"{self.name}_end")
@@ -64,7 +69,7 @@ class continuing:
                 setattr(obj, f"__static_{self.name}_periods", time_periods)
                 return True
         else:
-            # reset potential period is condition is not met
+            # reset potential period if condition is not met
             setattr(obj, f"__static_{self.name}_start", None)
             setattr(obj, f"__static_{self.name}_end", None)
         return False

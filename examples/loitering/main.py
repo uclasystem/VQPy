@@ -41,7 +41,7 @@ class People_loitering_query(vqpy.QueryBase):
             "track_id": None,
             "coordinate": lambda x: str(x),  # convert to string for
                                              # JSON serialization
-            # name in vqpy.continuing + '_duration' stored in VObj
+            # name in vqpy.continuing + '_periods' stored in VObj
             # can be accessed by getv, be used in select_cons, etc.
             "in_roi_periods": None,
         }
