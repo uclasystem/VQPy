@@ -1,5 +1,4 @@
 import argparse
-
 import vqpy
 from vqpy.detector.logger import register
 from yolox_detector import YOLOXDetector
@@ -39,12 +38,12 @@ class People_loitering_query(vqpy.QueryBase):
             ),
         }
         select_cons = {
+            "track_id": None,
             "coordinate": lambda x: str(x),  # convert to string for
                                              # JSON serialization
-            "track_id": None,
             # name in vqpy.continuing + '_duration' stored in VObj
             # can be accessed by getv, be used in select_cons, etc.
-            "in_roi_duration": None,
+            "in_roi_periods": None,
         }
         return vqpy.VObjConstraint(
             filter_cons, select_cons, filename="loitering"

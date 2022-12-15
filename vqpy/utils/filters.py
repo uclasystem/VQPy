@@ -24,23 +24,47 @@ class continuing:
         self.condition = condition
         self.duration = duration
         # use name given as property name of duration
-        self.name = f"{name}_duration"
+        self.name = name
 
     def __call__(self, obj, property):
+        cur_frame = obj._ctx.frame_id
+        # threshold should be set to the same as tracker's threshold of
+        # marking track as lost
+        # Currently set to equal ByteTrack's
+        threshold = int(obj._ctx.fps / 30.0 * 30)
         if self.condition(obj.getv(property)):
-            # increment duration if `condition` returns True
-            found = False
-            # check frames from the last to the first
-            for i in range(-1, -obj._track_length, -1):
-                duration = obj.getv(self.name, i)
-                if duration is not None:
-                    # increment duration
-                    found = True
-                    obj._datas[-1][self.name] = duration + 1
-                    if duration >= self.duration * obj._ctx.fps:
-                        return True
-                    break
-            if not found:
-                # initialize duration if duration attribute not found
-                obj._datas[-1][self.name] = 1
+            # get the start and end of the potentially continuing period
+            period_start = obj.getv(f"{self.name}_start")
+            period_end = obj.getv(f"{self.name}_end")
+            # if (potential) period is not valid
+            # or time interval exceeds threshold, reset period
+            if period_start is None or cur_frame - period_end > threshold:
+                period_start = cur_frame
+                period_end = cur_frame
+            else:
+                # update period, adding current frame to it
+                period_end = cur_frame
+            setattr(obj, f"__static_{self.name}_start", period_start)
+            setattr(obj, f"__static_{self.name}_end", period_end)
+            if period_end - period_start >= self.duration:
+                time_period = (int(period_start / obj._ctx.fps),
+                               int(period_end / obj._ctx.fps))
+                time_periods = obj.getv(f"{self.name}_periods")
+                if time_periods is not None:
+                    time_periods = time_periods.copy()
+                    if time_period[0] == time_periods[-1][0]:
+                        # start of current period is the same as end of last
+                        # should be merged
+                        time_periods[-1] = time_period
+                    else:
+                        # else a new period, append
+                        time_periods.append(time_period)
+                else:
+                    time_periods = [time_period]
+                setattr(obj, f"__static_{self.name}_periods", time_periods)
+                return True
+        else:
+            # reset potential period is condition is not met
+            setattr(obj, f"__static_{self.name}_start", None)
+            setattr(obj, f"__static_{self.name}_end", None)
         return False
