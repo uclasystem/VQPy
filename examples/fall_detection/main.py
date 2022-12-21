@@ -1,3 +1,4 @@
+import sys
 import vqpy
 from yolox_detector import YOLOXDetector
 from vqpy.detector.logger import register
@@ -6,12 +7,15 @@ import torch
 import numpy as np
 import argparse
 
+sys.path.append("VQPy/examples/fall_detection/detect/")
 # pose detection
-from PoseEstimateLoader import SPPE_FastPose
-from ActionsEstLoader import TSSTG
+from PoseEstimateLoader import SPPE_FastPose  # noqa: E402
+from ActionsEstLoader import TSSTG  # noqa: E402
 
+# note:
+# model checkpoints are hard-coded in ActionsEstLoader.py and
+# SPPE/src/main_fast_inference.py
 # default values
-# model checkpoints are hard-coded in Actionsrecognition/ and PoseEstimation/
 pose_model = SPPE_FastPose('resnet50', 224, 160, device='cuda')
 action_model = TSSTG()
 
