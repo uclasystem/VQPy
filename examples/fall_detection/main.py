@@ -46,7 +46,7 @@ class Person(vqpy.VObjBase):
         image = self._ctx.frame
         if self.getv('tlbr') is None:
             return None
-        return pose_model.predict(image, torch.tensor([self.getv('tlbr')]))
+        return Person.pose_model.predict(image, torch.tensor([self.getv('tlbr')]))
 
     @vqpy.property()
     def pose(self) -> str:
@@ -60,8 +60,8 @@ class Person(vqpy.VObjBase):
         if len(keypoints_list) < 30:
             return 'unknown'
         pts = np.array(keypoints_list, dtype=np.float32)
-        out = action_model.predict(pts, self._ctx.frame.shape[:2])
-        action_name = action_model.class_names[out[0].argmax()]
+        out = Person.action_model.predict(pts, self._ctx.frame.shape[:2])
+        action_name = Person.action_model.class_names[out[0].argmax()]
         return action_name
 
 
@@ -83,7 +83,7 @@ if __name__ == '__main__':
     register("yolox", YOLOXDetector, "yolox_x.pth")
     vqpy.launch(cls_name=vqpy.COCO_CLASSES,
                 cls_type={"person": Person},
-                tasks=[ListPersonPose()],
+                tasks=[FallDetection()],
                 video_path=args.path,
                 save_folder=args.save_folder,
                 detector_name="yolox",
