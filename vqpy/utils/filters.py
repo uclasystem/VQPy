@@ -51,7 +51,7 @@ class continuing:
                 period_end = cur_frame
             setattr(obj, f"__static_{self.name}_start", period_start)
             setattr(obj, f"__static_{self.name}_end", period_end)
-            if period_end - period_start >= self.duration:
+            if period_end - period_start >= self.duration * obj._ctx.fps:
                 time_period = (int(period_start / obj._ctx.fps),
                                int(period_end / obj._ctx.fps))
                 time_periods = obj.getv(f"{self.name}_periods")
