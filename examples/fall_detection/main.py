@@ -12,13 +12,6 @@ sys.path.append("VQPy/examples/fall_detection/detect/")
 from PoseEstimateLoader import SPPE_FastPose  # noqa: E402
 from ActionsEstLoader import TSSTG  # noqa: E402
 
-# note:
-# model checkpoints are hard-coded in ActionsEstLoader.py and
-# SPPE/src/main_fast_inference.py
-# default values
-pose_model = SPPE_FastPose('resnet50', 224, 160, device='cuda')
-action_model = TSSTG()
-
 
 def make_parser():
     parser = argparse.ArgumentParser('VQPy Demo!')
@@ -37,6 +30,13 @@ def make_parser():
 
 class Person(vqpy.VObjBase):
     required_fields = ['class_id', 'tlbr']
+    
+    # note:
+    # model checkpoints are hard-coded in ActionsEstLoader.py and
+    # SPPE/src/main_fast_inference.py
+    # default values
+    pose_model = SPPE_FastPose('resnet50', 224, 160, device='cuda')
+    action_model = TSSTG()
 
     @vqpy.property()
     @vqpy.stateful(30)
@@ -65,7 +65,7 @@ class Person(vqpy.VObjBase):
         return action_name
 
 
-class ListPersonPose(vqpy.QueryBase):
+class FallDetection(vqpy.QueryBase):
     """The class obtaining all fallen person"""
     @staticmethod
     def setting() -> vqpy.VObjConstraint:
