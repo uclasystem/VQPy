@@ -119,6 +119,20 @@ def access_data(cond: Dict[str, Callable]):
 def cross_vobj_property(
         vobj_type=None, vobj_num="ALL", vobj_input_fields=None
         ):
+    """Decorator for cross-object property computation.
+
+    Wrapper for cross-object property computation. Retrieves list of properties
+    of VObjs of specified type and passes them to the function, as
+    `List[property1], List[property2], ...`.
+
+    Attributes:
+    vobj_type: VObjGeneratorType
+        type of VObj to retrieve
+    vobj_num: int
+        number of VObjs to retrieve
+    vobj_input_fields: List[str]
+        list of names of properties to retrieve from VObjs
+    """
     # vobj_num defaults to "ALL" for now
     # other possible options could be user-specified number
     def wrap(func: Callable):

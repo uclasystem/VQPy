@@ -29,6 +29,8 @@ class Frame:
             # temporary, should be querying on Frame
             new_vobj = vobj_type(self)
             self.vobjs[vobj_type][track_id] = new_vobj
+        else:
+            self.vobjs[vobj_type][track_id]._frame = self
         # update vobj
         vobj = self.vobjs[vobj_type][track_id]
         vobj.update(data)
