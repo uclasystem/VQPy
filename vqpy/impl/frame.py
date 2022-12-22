@@ -30,6 +30,7 @@ class Frame:
             new_vobj = vobj_type(self)
             self.vobjs[vobj_type][track_id] = new_vobj
         else:
+            # update _frame if vobj already exists
             self.vobjs[vobj_type][track_id]._frame = self
         # update vobj
         vobj = self.vobjs[vobj_type][track_id]
