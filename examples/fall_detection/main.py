@@ -30,7 +30,7 @@ def make_parser():
 
 class Person(vqpy.VObjBase):
     required_fields = ['class_id', 'tlbr']
-    
+
     # note:
     # model checkpoints are hard-coded in ActionsEstLoader.py and
     # SPPE/src/main_fast_inference.py
@@ -44,9 +44,10 @@ class Person(vqpy.VObjBase):
         # per-frame property, but tracker can return objects
         # not in the current frame
         image = self._ctx.frame
-        if self.getv('tlbr') is None:
+        tlbr = self.getv('tlbr')
+        if tlbr is None:
             return None
-        return Person.pose_model.predict(image, torch.tensor([self.getv('tlbr')]))
+        return Person.pose_model.predict(image, torch.tensor([tlbr]))
 
     @vqpy.property()
     def pose(self) -> str:
