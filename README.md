@@ -14,9 +14,9 @@ In order to declare a video query with VQPy, users need to extend two classes de
 
 #### Define a `VObj`
 
-Users can define their own objects of interest, as well as the property in the objects they hope to query on, with a `VObj` class. 
+Users can define their own objects of interest, as well as the property in the objects they hope to query on, with a `VObj` class. The definition should start with a `@vqpy.property` decorator.
 
-For example,  if we are interested in the vehicle object in the video, and want to query the license plate. We can define a `Vobj` class as below. 
+For example, if we are interested in the vehicle object in the video, and want to query the license plate. We can define a `Vobj` class as below. 
 
 ```python
 class Vehicle(vqpy.VObjBase):
@@ -27,9 +27,13 @@ class Vehicle(vqpy.VObjBase):
         return self.infer('license_plate', {'license_plate': 'openalpr'})
 ```
 
+For more details on how users can define their own property, please refer to the **Examples** section and see how we define objects in our demos.
+
 #### Define a `Query`
 
 Users can express their queries through SQL-like constraints with `VObjConstraint`, which is a return value of the `setting` method in their `Query` class. In `VObjConstraint`, users can specify query constraints on the interested object with `filter_cons`, and `select_cons` gives the projection of the properties the query shall return.
+
+Moreover, the user can provide some functions when The projected properties will pass a postprocess function provided by the user, which is the identity function by default. 
 
 The code below demonstrates a query that selects all the `Vehicle` objects whose velocity is greater than 0.1, and chooses the two properties of `track_id`  and `license_plate` for return.
 
@@ -39,7 +43,7 @@ class ListMovingVehicle(vqpy.QueryBase):
     @staticmethod
     def setting() -> vqpy.VObjConstraint:
         filter_cons = {'__class__': lambda x: x == Vehicle,
-                       'bbox_velocity': lambda x: x >= 0.1}
+                       'velocity': lambda x: x >= 0.1}
         select_cons = {'track_id': None,
                        'license_plate': None}
         return vqpy.VObjConstraint(filter_cons=filter_cons,
@@ -55,7 +59,9 @@ vqpy.launch(cls_name=vqpy.COCO_CLASSES, # detection class
             cls_type={"car": Vehicle, "truck": Vehicle}, # mappings from detection class to VObj
             tasks=[ListMovingVehicle()], # a list of Queries to apply
             video_path=args.path, # the path of the queried video
-            save_folder=args.save_folder # result of query will be saved as a json file in this folder
+            save_folder=args.save_folder, # result of query will be saved as a json file in this folder
+            detector_name="yolox", # optional, specify the name of user's own model
+            detector_model_dir=args.pretrained_model_dir # optional, specify the directory of user's pretrained model
             )
 ```
 
@@ -67,7 +73,24 @@ For more details on customization, please refer to the document [here](https://g
 
 ## Examples
 
-We have included two examples for demonstrating VQPy.
+We have included several examples for demonstrating VQPy.
 
+- [Fall Detection](examples/fall_detection): detect people in the video and recognize fallen person.
 - [List red moving vehicle](examples/list_red_moving_vehicle): show license plate of red moving vehicle.
-- [Pedestrian Counting](examples/count_person): count the number of pedestrians at the crosswalk.
+- [People Loitering](examples/loitering): count the number of person loitering around.
+- [People Counting](examples/people_counting): count the number of person heading both directions. 
+- [Unattended Baggage Detection](examples/unattended_baggage): detect unattended baggages.
+
+In the following, we will discuss about the objects of interests in each of the above examples, which may help understand how to code with VQPy.
+
+TODO:
+
+### Fall Detection
+
+### List Red Moving Vehicle
+
+### People Loitering
+
+### People Counting
+
+### Unattended Baggage Detection
