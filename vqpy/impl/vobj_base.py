@@ -77,9 +77,11 @@ class VObjBase(VObjBaseInterface):
                   getattr(self, '__index_' + attr) == self._ctx.frame_id):
                 return getattr(self, '__record_' + attr)
             elif attr in self._registered_names:
-                if 'frame' in inspect.signature(getattr(self, attr).__wrapped__, follow_wrapped=False).parameters:
-                    raise ValueError(f"{attr} not yet available")
-                    # return getattr(self, attr)(some_frame)
+                if 'frame' in inspect.signature(getattr(self, attr), follow_wrapped=False).parameters:
+                    return None
+                    # return getattr(self, attr)(frame)
+                    # TODO: make frame available
+                    # TODO: replace reflection with explicit registration
                 return getattr(self, attr)()
             else:
                 assert len(self._datas) > 0
@@ -111,8 +113,8 @@ class VObjBase(VObjBaseInterface):
             self._datas.append(None)
             self._track_length = 0
         for method_name in self._registered_names:
-            if 'frame' in inspect.signature(getattr(self, method_name).__wrapped__, follow_wrapped=False).parameters:
-                getattr(self, method_name)(frame=frame)
+            if 'frame' in inspect.signature(getattr(self, method_name), follow_wrapped=False).parameters:
+                continue
             # properties updated here
             getattr(self, method_name)()
 

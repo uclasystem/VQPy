@@ -137,16 +137,29 @@ def cross_vobj_property(
     # other possible options could be user-specified number
     def wrap(func: Callable):
         @functools.wraps(func)
-        def wrapped_func(self: VObjBaseInterface, frame):
+        def wrapped_func(self: VObjBaseInterface, frame=None):
             # somehow find all vobjs of specified type and their properties
             # pass the properties to func and return value
-            vobjs = frame.get_tracked_vobjs(vobj_type)
-            arg = tuple()
-            for input_field in vobj_input_fields:
-                properties = []
-                for vobj in vobjs:
-                    properties.append(vobj.getv(input_field))
-                arg = arg + (properties,)
-            return func(self, *arg)
+            if len(self._datas) > 0:
+                vobjs = frame.get_tracked_vobjs(vobj_type)
+                arg = tuple()
+                for input_field in vobj_input_fields:
+                    properties = []
+                    for vobj in vobjs:
+                        properties.append(vobj.getv(input_field))
+                    arg = arg + (properties,)
+                vidx = '__record_' + func.__name__
+                aidx = '__index_' + func.__name__
+                if getattr(self, aidx, None) == self._ctx.frame_id:
+                    return getattr(self, vidx)
+                else:
+                    value = func(self, *arg)
+                    setattr(self, vidx, value)
+                    setattr(self, aidx, self._ctx.frame_id)
+                    return value
+            elif func.__name__ not in self._registered_names:
+                # initialization
+                self._registered_names.append(func.__name__)
+                return None
         return wrapped_func
     return wrap
