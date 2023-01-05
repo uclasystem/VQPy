@@ -1,6 +1,7 @@
 """VObjBase implementation"""
 
 from typing import Dict, List, Optional
+import inspect
 
 from ..base.interface import VObjBaseInterface
 from ..function import infer
@@ -76,6 +77,9 @@ class VObjBase(VObjBaseInterface):
                   getattr(self, '__index_' + attr) == self._ctx.frame_id):
                 return getattr(self, '__record_' + attr)
             elif attr in self._registered_names:
+                if 'frame' in inspect.signature(getattr(self, attr).__wrapped__, follow_wrapped=False).parameters:
+                    raise ValueError(f"{attr} not yet available")
+                    # return getattr(self, attr)(some_frame)
                 return getattr(self, attr)()
             else:
                 assert len(self._datas) > 0
@@ -98,7 +102,7 @@ class VObjBase(VObjBaseInterface):
             else:
                 return None
 
-    def update(self, data: Optional[Dict]):
+    def update(self, data: Optional[Dict], frame: Frame):
         """Update data this frame to object"""
         if data is not None:
             self._datas.append(data.copy())
@@ -107,6 +111,9 @@ class VObjBase(VObjBaseInterface):
             self._datas.append(None)
             self._track_length = 0
         for method_name in self._registered_names:
+            if 'frame' in inspect.signature(getattr(self, method_name).__wrapped__, follow_wrapped=False).parameters:
+                getattr(self, method_name)(frame=frame)
+            # properties updated here
             getattr(self, method_name)()
 
     def infer(self,

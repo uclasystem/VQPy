@@ -34,7 +34,7 @@ class Frame:
             self.vobjs[vobj_type][track_id]._frame = self
         # update vobj
         vobj = self.vobjs[vobj_type][track_id]
-        vobj.update(data)
+        vobj.update(data, self)
 
         # update tracked and lost vobjs
         if data:

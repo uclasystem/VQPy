@@ -137,10 +137,10 @@ def cross_vobj_property(
     # other possible options could be user-specified number
     def wrap(func: Callable):
         @functools.wraps(func)
-        def wrapped_func(self: VObjBaseInterface, *args, **kwargs):
+        def wrapped_func(self: VObjBaseInterface, frame):
             # somehow find all vobjs of specified type and their properties
             # pass the properties to func and return value
-            vobjs = self._frame.get_tracked_vobjs(vobj_type)
+            vobjs = frame.get_tracked_vobjs(vobj_type)
             arg = tuple()
             for input_field in vobj_input_fields:
                 properties = []
