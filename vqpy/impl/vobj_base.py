@@ -99,7 +99,8 @@ class VObjBase(VObjBaseInterface):
                 return None
 
         else:
-            raise ValueError(f"We don't support retrieve historical data from non-stateful properties. \
+            raise ValueError(f"We don't support retrieve historical data from \
+                non-stateful properties. \
                 Please add @stateful() decorator to property {attr}.")
 
     def update(self, data: Optional[Dict]):
