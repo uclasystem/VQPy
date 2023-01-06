@@ -30,6 +30,7 @@ def property():
             elif func.__name__ not in self._registered_names:
                 # initialization
                 self._registered_names.append(func.__name__)
+                self._registered_names_type[func.__name__] = 'property'
                 return None
         return wrapper
     return decorator
@@ -162,6 +163,7 @@ def cross_vobj_property(
             elif func.__name__ not in self._registered_names:
                 # initialization
                 self._registered_names.append(func.__name__)
+                self._registered_names_type[func.__name__] = 'cross_vobj_property'
                 return None
         return wrapped_func
     return wrap

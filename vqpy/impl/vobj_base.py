@@ -1,7 +1,6 @@
 """VObjBase implementation"""
 
 from typing import Dict, List, Optional
-import inspect
 
 from ..base.interface import VObjBaseInterface
 from ..function import infer
@@ -20,6 +19,7 @@ class VObjBase(VObjBaseInterface):
         self._track_length = 0
         self._datas: List[Optional[Dict]] = []
         self._registered_names: List[str] = []
+        self._registered_names_type: Dict[str, str] = {}
         self._working_infers: List[str] = []
         # NOTE: now @property instances are stored in the order of __dir__()
         for instance_name in self.__dir__():
@@ -81,7 +81,7 @@ class VObjBase(VObjBaseInterface):
                 return getattr(self, '__record_' + attr)
             elif attr in self._registered_names:
                 # TODO: replace reflection with explicit registration
-                if 'frame' in inspect.signature(getattr(self, attr), follow_wrapped=False).parameters:
+                if self._registered_names_type[attr] == 'cross_vobj_property':
                     return getattr(self, attr)(frame)
                 return getattr(self, attr)()
             else:
@@ -114,7 +114,7 @@ class VObjBase(VObjBaseInterface):
             self._datas.append(None)
             self._track_length = 0
         for method_name in self._registered_names:
-            if 'frame' in inspect.signature(getattr(self, method_name), follow_wrapped=False).parameters:
+            if self._registered_names_type[method_name] == 'cross_vobj_property':
                 continue
             # properties updated here
             getattr(self, method_name)()

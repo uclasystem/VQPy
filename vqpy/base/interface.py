@@ -23,6 +23,7 @@ class VObjBaseInterface(object):
         self._datas: List[Optional[Dict]] = []
         # List of @property instances
         self._registered_names: List[str] = []
+        self._registered_names_type: Dict[str, str] = {}
         raise NotImplementedError
 
     def getv(self,
