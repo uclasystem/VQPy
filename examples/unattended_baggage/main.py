@@ -32,6 +32,7 @@ class Person(vqpy.VObjBase):
 
 
 class Baggage(vqpy.VObjBase):
+    @vqpy.stateful()
     @vqpy.cross_vobj_property(
         vobj_type=Person, vobj_num="ALL",
         vobj_input_fields=("track_id", "tlbr")
