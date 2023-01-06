@@ -1,7 +1,7 @@
 """Interfaces that requires implementations in impl/"""
 
 from __future__ import annotations
-from typing import Dict, List, Optional, Callable
+from typing import Dict, List, Optional, Callable, Set
 
 from ..utils.video import FrameStream
 
@@ -21,8 +21,8 @@ class VObjBaseInterface(object):
         # Historic object data. TODO: shrink memory
         self._datas: List[Optional[Dict]] = []
         # List of @property instances
-        self._registered_names: List[str] = []
-        self._registered_names_type: Dict[str, str] = {}
+        self._registered_names: Set[str] = set()
+        self._registered_cross_vobj_names: Set[str] = set()
         raise NotImplementedError
 
     def getv(self,

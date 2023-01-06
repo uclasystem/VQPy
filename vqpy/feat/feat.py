@@ -29,8 +29,7 @@ def property():
                     return value
             elif func.__name__ not in self._registered_names:
                 # initialization
-                self._registered_names.append(func.__name__)
-                self._registered_names_type[func.__name__] = 'property'
+                self._registered_names.add(func.__name__)
                 return None
         return wrapper
     return decorator
@@ -160,10 +159,9 @@ def cross_vobj_property(
                     setattr(self, vidx, value)
                     setattr(self, aidx, self._ctx.frame_id)
                     return value
-            elif func.__name__ not in self._registered_names:
+            elif func.__name__ not in self._registered_cross_vobj_names:
                 # initialization
-                self._registered_names.append(func.__name__)
-                self._registered_names_type[func.__name__] = 'cross_vobj_property'
+                self._registered_cross_vobj_names.add(func.__name__)
                 return None
         return wrapped_func
     return wrap
