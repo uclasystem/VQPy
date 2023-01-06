@@ -59,7 +59,7 @@ class VObjConstraint(VObjConstraintInterface):
                 if type(func) == continuing:
                     ok = func(obj, property_name, frame)
                 else:
-                    it = obj.getv(property_name, -1, frame)
+                    it = obj.getv(property_name, frame=frame)
                     if it is None or not func(it):
                         ok = False
                         break

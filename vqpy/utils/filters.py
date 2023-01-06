@@ -38,7 +38,7 @@ class continuing:
         # Currently set to equal ByteTrack's threshold
         # Optional frame argument for properties decorated with @cross_vobj_property
         threshold = int(obj._ctx.fps / 30.0 * 30)
-        if self.condition(obj.getv(property_name, -1, frame)):
+        if self.condition(obj.getv(property_name, frame=frame)):
             # get the start and end of the potentially continuing period
             period_start = obj.getv(f"{self.name}_start")
             period_end = obj.getv(f"{self.name}_end")
