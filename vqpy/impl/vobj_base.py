@@ -98,7 +98,8 @@ class VObjBase(VObjBaseInterface):
             else:
                 return None
 
-        else:
+        if hasattr(self, '__record_' + attr) and \
+                not hasattr(self, '__state_' + attr):
             raise ValueError(f"We don't support retrieve historical data from \
                 non-stateful properties. \
                 Please add @stateful() decorator to property {attr}.")
