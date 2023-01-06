@@ -13,10 +13,9 @@ class VObjBaseInterface(object):
     The tracker is responsible to keep objects updated when the track is active
     """
 
-    def __init__(self, frame: FrameInterface):
-        self._frame = frame
-        self._ctx = frame.ctx
-        self._start_idx = frame.ctx.frame_id
+    def __init__(self, ctx: FrameStream):
+        self._ctx = ctx
+        self._start_idx = ctx.frame_id
         # Number of frames consecutively appears
         self._track_length = 0
         # Historic object data. TODO: shrink memory
