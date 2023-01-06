@@ -140,6 +140,8 @@ def cross_vobj_property(
         def wrapped_func(self: VObjBaseInterface, frame=None):
             # somehow find all vobjs of specified type and their properties
             # pass the properties to func and return value
+            # parameter frame has default value None in order to maintain "same" interface with @property
+            # this compatibility is mainly used in VObjBase.__init__
             if len(self._datas) > 0:
                 vobjs = frame.get_tracked_vobjs(vobj_type)
                 arg = tuple()

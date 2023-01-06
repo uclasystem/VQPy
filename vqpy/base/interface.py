@@ -28,6 +28,7 @@ class VObjBaseInterface(object):
     def getv(self,
              attr: str,
              index: int = -1,
+             frame: Optional[FrameInterface] = None,
              specifications: Optional[Dict[str, str]] = None):
         """
         attr: attribute name.
@@ -60,11 +61,15 @@ class VObjConstraintInterface(object):
         """merge constraints in the form subclass + superclass"""
         raise NotImplementedError
 
-    def filter(self, objs: List[VObjBaseInterface]) -> List[VObjBaseInterface]:
+    def filter(self, objs: List[VObjBaseInterface], frame: FrameInterface) -> List[VObjBaseInterface]:
         """filter the list of vobjects from the constraint"""
         raise NotImplementedError
 
-    def apply(self, vobjs: List[VObjBaseInterface]) -> List[Dict]:
+    def select(self, objs: List[VObjBaseInterface]) -> VObjBaseInterface:
+        """select one vobject from the constraint"""
+        raise NotImplementedError
+    
+    def apply(self, vobjs: List[VObjBaseInterface], frame: FrameInterface) -> List[Dict]:
         """apply the constraint on a list of VObj instances"""
         raise NotImplementedError
 

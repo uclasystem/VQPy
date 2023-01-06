@@ -31,13 +31,14 @@ class continuing:
         # use name given as property name of time periods
         self.name = name
 
-    def __call__(self, obj, property_name):
+    def __call__(self, obj, property_name, frame=None):
         cur_frame = obj._ctx.frame_id
         # threshold should be set to the same as tracker's threshold of marking
         # track as lost
         # Currently set to equal ByteTrack's threshold
+        # Optional frame argument for properties decorated with @cross_vobj_property
         threshold = int(obj._ctx.fps / 30.0 * 30)
-        if self.condition(obj.getv(property_name)):
+        if self.condition(obj.getv(property_name, -1, frame)):
             # get the start and end of the potentially continuing period
             period_start = obj.getv(f"{self.name}_start")
             period_end = obj.getv(f"{self.name}_end")

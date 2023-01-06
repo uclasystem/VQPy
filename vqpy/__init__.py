@@ -62,7 +62,7 @@ def launch(cls_name,
         outputs = detector.inference(frame_image)
         tracked_tracks, _, frame = tracker.update(outputs, frame)
         for task in tasks:
-            task.vqpy_update(frame_id, tracked_tracks)
+            task.vqpy_update(frame_id, tracked_tracks, frame)
 
         if frame_id * save_freq >= tag and save_folder:
             if tag == stream.n_frames:

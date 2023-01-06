@@ -41,6 +41,7 @@ class VObjBase(VObjBaseInterface):
     def getv(self,
              attr: str,
              index: int = -1,
+             frame: Optional[Frame] = None,
              specifications: Optional[Dict[str, str]] = None):
         """
         NOTE: Note the order in the following checking.
@@ -59,6 +60,8 @@ class VObjBase(VObjBaseInterface):
 
         __static_ can be used to store properties that are not time-related.
         e.g. color of object, aggregated properties
+        
+        frame: the frame to be used for inference, used when the attribute is decorated with @cross_vobj_property
         """
         # patchwork to support __static_
         if hasattr(self, '__static_' + attr):
@@ -77,11 +80,9 @@ class VObjBase(VObjBaseInterface):
                   getattr(self, '__index_' + attr) == self._ctx.frame_id):
                 return getattr(self, '__record_' + attr)
             elif attr in self._registered_names:
+                # TODO: replace reflection with explicit registration
                 if 'frame' in inspect.signature(getattr(self, attr), follow_wrapped=False).parameters:
-                    return None
-                    # return getattr(self, attr)(frame)
-                    # TODO: make frame available
-                    # TODO: replace reflection with explicit registration
+                    return getattr(self, attr)(frame)
                 return getattr(self, attr)()
             else:
                 assert len(self._datas) > 0

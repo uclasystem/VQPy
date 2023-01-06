@@ -6,7 +6,8 @@ from typing import List
 from ..base.interface import (
     VObjBaseInterface,
     VObjConstraintInterface,
-    OutputConfig
+    OutputConfig,
+    FrameInterface
 )
 
 
@@ -34,8 +35,9 @@ class QueryBase(object):
 
     def vqpy_update(self,
                     frame_id: int,
-                    vobjs: List[VObjBaseInterface]):
-        data, filtered_ids = self._setting.apply(vobjs)
+                    vobjs: List[VObjBaseInterface],
+                    frame: FrameInterface):
+        data, filtered_ids = self._setting.apply(vobjs, frame)
 
         # total vobj num is always the first element of output
         if self._output_configs.output_total_vobj_num:

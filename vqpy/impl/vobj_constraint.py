@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import Callable, Dict, List, Optional
-from ..base.interface import VObjBaseInterface, VObjConstraintInterface
+from ..base.interface import VObjBaseInterface, VObjConstraintInterface, FrameInterface
 from ..utils.filters import continuing
 
 
@@ -48,7 +48,7 @@ class VObjConstraint(VObjConstraintInterface):
         select_cons = self.select_cons.copy()
         return VObjConstraint(filter_cons, select_cons, self.filename)
 
-    def filter(self, objs: List[VObjBaseInterface]) -> List[VObjBaseInterface]:
+    def filter(self, objs: List[VObjBaseInterface], frame: FrameInterface) -> List[VObjBaseInterface]:
         """filter the list of vobjects from the constraint"""
         ret: List[VObjBaseInterface] = []
         for obj in objs:
@@ -57,9 +57,9 @@ class VObjConstraint(VObjConstraintInterface):
                 # patch work to support vqpy.utils.continuing since Vobj needs
                 # to be passed as an argument
                 if type(func) == continuing:
-                    ok = func(obj, property_name)
+                    ok = func(obj, property_name, frame)
                 else:
-                    it = obj.getv(property_name)
+                    it = obj.getv(property_name, -1, frame)
                     if it is None or not func(it):
                         ok = False
                         break
@@ -73,10 +73,10 @@ class VObjConstraint(VObjConstraintInterface):
                  for key, postproc in self.select_cons.items()}
                 for x in objs]
 
-    def apply(self, vobjs: List[VObjBaseInterface]) -> List[Dict]:
+    def apply(self, vobjs: List[VObjBaseInterface], frame: FrameInterface) -> List[Dict]:
         """apply the constraint on a list of VObj instances"""
         # TODO: optimize the procedure
-        filtered = self.filter(vobjs)
+        filtered = self.filter(vobjs, frame)
         selected = self.select(filtered)
         filtered_ids = [obj.getv("track_id") for obj in filtered]
         return selected, filtered_ids
