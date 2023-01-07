@@ -123,7 +123,7 @@ def cross_vobj_property(
 
     Wrapper for cross-object property computation. Retrieves list of properties
     of VObjs of specified type and passes them to the function, as
-    `List[property1], List[property2], ...`.
+    `List[Tuple(property1, property2, ...), ...]`
 
     Attributes:
     vobj_type: VObjGeneratorType
@@ -137,7 +137,7 @@ def cross_vobj_property(
     # other possible options could be user-specified number
     def wrap(func: Callable):
         @functools.wraps(func)
-        def wrapped_func(self: VObjBaseInterface, *arg):
+        def wrapped_func(self: VObjBaseInterface, cross_vobj_arg: Optional[List] = None):
             # somehow find all vobjs of specified type and their properties
             # pass the properties to func and return value
             # parameter other_vobjs has default value None in order to maintain "same" interface with @property
@@ -148,7 +148,7 @@ def cross_vobj_property(
                 if getattr(self, aidx, None) == self._ctx.frame_id:
                     return getattr(self, vidx)
                 else:
-                    value = func(self, *arg)
+                    value = func(self, cross_vobj_arg)
                     setattr(self, vidx, value)
                     setattr(self, aidx, self._ctx.frame_id)
                     return value

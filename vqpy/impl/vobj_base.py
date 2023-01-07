@@ -82,7 +82,7 @@ class VObjBase(VObjBaseInterface):
             elif attr in self._registered_names:
                 return getattr(self, attr)()
             elif attr in self._registered_cross_vobj_names:
-                return getattr(self, attr)(*cross_vobj_args)
+                return getattr(self, attr)(cross_vobj_args)
             else:
                 assert len(self._datas) > 0
                 self._working_infers.append(attr)
