@@ -48,18 +48,51 @@ class VObjConstraint(VObjConstraintInterface):
         select_cons = self.select_cons.copy()
         return VObjConstraint(filter_cons, select_cons, self.filename)
 
-    def filter(self, objs: List[VObjBaseInterface], frame: FrameInterface) -> List[VObjBaseInterface]:
+    def filter(self, frame) -> List[VObjBaseInterface]:
         """filter the list of vobjects from the constraint"""
+        # Some assumptions:
+        # - each query will only filter one type of VObj (called desired VObj type)
+        # - query will implement such filter by filtering on the "__class__" property
+        
+        # function used in query to select the desired VObjs
+        filter_func = self.filter_cons["__class__"]
+        # get the first VObj type that satisfies the filter function, should be the desired VObj type
+        vobj_type = next((vobj_type for vobj_type in frame.vobjs.keys() if filter_func(vobj_type)), None)
+        # all VObjs of the desired type
+        vobjs = frame.get_tracked_vobjs(vobj_type)
+        # return empty list if no VObj of the desired type
+        if len(vobjs) == 0:
+            return []
+        
+        # retrieve properties of other VObj types that are required by @cross_vobj_property
+        # and store them in a dictionary {property_name: (list of property_values, ...)}
+        # since all VObjs of the same type should share the same properties (even if there are multiple queries), we only need to retrieve the properties once, using information from any VObj of that type (use the first one here)
+        # TODO: change Tuple([properties of each VObj], [], ...) to List[Tuple(property_values, ...) of each VObj]
+        cross_vobj_args = {}
+        for cross_vobj_property in vobjs[0]._registered_cross_vobj_names.keys():
+            # get the type of the other VObj and the properties required by the @cross_vobj_property
+            other_vobj_type, other_vobj_input_fields = vobjs[0]._registered_cross_vobj_names[cross_vobj_property]
+            other_vobjs = frame.get_tracked_vobjs(other_vobj_type)
+            properties = []
+            for input_field in other_vobj_input_fields:
+                properties.append([vobj.getv(input_field) for vobj in other_vobjs])
+            cross_vobj_args[cross_vobj_property] = tuple(properties)
+            
         ret: List[VObjBaseInterface] = []
-        for obj in objs:
+        for obj in vobjs:
             ok = True
             for property_name, func in self.filter_cons.items():
                 # patch work to support vqpy.utils.continuing since Vobj needs
                 # to be passed as an argument
+                if property_name == "__class__":
+                    continue
                 if type(func) == continuing:
-                    ok = func(obj, property_name, frame)
+                    # use property name to access the corresponding property values
+                    # if property is not decorated with @cross_vobj_property, just use None (will be ignored if the property is decorated with @property)
+                    ok = func(obj, property_name, cross_vobj_args = cross_vobj_args.get(property_name, None))
                 else:
-                    it = obj.getv(property_name, frame=frame)
+                    # same for getv
+                    it = obj.getv(property_name, cross_vobj_args = cross_vobj_args.get(property_name, None))
                     if it is None or not func(it):
                         ok = False
                         break
@@ -73,10 +106,10 @@ class VObjConstraint(VObjConstraintInterface):
                  for key, postproc in self.select_cons.items()}
                 for x in objs]
 
-    def apply(self, vobjs: List[VObjBaseInterface], frame: FrameInterface) -> List[Dict]:
+    def apply(self, frame) -> List[Dict]:
         """apply the constraint on a list of VObj instances"""
         # TODO: optimize the procedure
-        filtered = self.filter(vobjs, frame)
+        filtered = self.filter(frame)
         selected = self.select(filtered)
         filtered_ids = [obj.getv("track_id") for obj in filtered]
         return selected, filtered_ids

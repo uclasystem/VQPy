@@ -60,9 +60,9 @@ def launch(cls_name,
     for frame_id in tqdm(range(1, stream.n_frames + 1)):
         frame_image = stream.next()
         outputs = detector.inference(frame_image)
-        tracked_tracks, _, frame = tracker.update(outputs, frame)
+        _, _, frame = tracker.update(outputs, frame)    # frame contains all vobjs, enough for all queries
         for task in tasks:
-            task.vqpy_update(frame_id, tracked_tracks, frame)
+            task.vqpy_update(frame)
 
         if frame_id * save_freq >= tag and save_folder:
             if tag == stream.n_frames:

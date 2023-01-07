@@ -1,7 +1,7 @@
 """Interfaces that requires implementations in impl/"""
 
 from __future__ import annotations
-from typing import Dict, List, Optional, Callable, Set
+from typing import Dict, List, Optional, Callable, Set, Tuple
 
 from ..utils.video import FrameStream
 
@@ -28,7 +28,7 @@ class VObjBaseInterface(object):
     def getv(self,
              attr: str,
              index: int = -1,
-             frame: Optional[FrameInterface] = None,
+             cross_vobj_args: Optional[Tuple] = None,
              specifications: Optional[Dict[str, str]] = None):
         """
         attr: attribute name.
@@ -61,7 +61,7 @@ class VObjConstraintInterface(object):
         """merge constraints in the form subclass + superclass"""
         raise NotImplementedError
 
-    def filter(self, objs: List[VObjBaseInterface], frame: FrameInterface) -> List[VObjBaseInterface]:
+    def filter(self, frame: FrameInterface) -> List[VObjBaseInterface]:
         """filter the list of vobjects from the constraint"""
         raise NotImplementedError
 
@@ -69,7 +69,7 @@ class VObjConstraintInterface(object):
         """select one vobject from the constraint"""
         raise NotImplementedError
     
-    def apply(self, vobjs: List[VObjBaseInterface], frame: FrameInterface) -> List[Dict]:
+    def apply(self, frame: FrameInterface) -> List[Dict]:
         """apply the constraint on a list of VObj instances"""
         raise NotImplementedError
 

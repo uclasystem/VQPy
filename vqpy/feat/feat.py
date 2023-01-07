@@ -1,7 +1,7 @@
 """The features for easy coding in VQPy"""
 
 import functools
-from typing import Callable, Dict, List
+from typing import Callable, Dict, List, Optional
 
 from ..base.interface import VObjBaseInterface
 
@@ -137,19 +137,12 @@ def cross_vobj_property(
     # other possible options could be user-specified number
     def wrap(func: Callable):
         @functools.wraps(func)
-        def wrapped_func(self: VObjBaseInterface, frame=None):
+        def wrapped_func(self: VObjBaseInterface, *arg):
             # somehow find all vobjs of specified type and their properties
             # pass the properties to func and return value
-            # parameter frame has default value None in order to maintain "same" interface with @property
-            # this compatibility is mainly used in VObjBase.__init__
+            # parameter other_vobjs has default value None in order to maintain "same" interface with @property
+            # this compatibility is mainly used in VObjBase.__init__ at instance()
             if len(self._datas) > 0:
-                vobjs = frame.get_tracked_vobjs(vobj_type)
-                arg = tuple()
-                for input_field in vobj_input_fields:
-                    properties = []
-                    for vobj in vobjs:
-                        properties.append(vobj.getv(input_field))
-                    arg = arg + (properties,)
                 vidx = '__record_' + func.__name__
                 aidx = '__index_' + func.__name__
                 if getattr(self, aidx, None) == self._ctx.frame_id:
@@ -161,7 +154,8 @@ def cross_vobj_property(
                     return value
             elif func.__name__ not in self._registered_cross_vobj_names:
                 # initialization
-                self._registered_cross_vobj_names.add(func.__name__)
+                # register function name, required VObj type and required fields
+                self._registered_cross_vobj_names[func.__name__] = (vobj_type, vobj_input_fields)
                 return None
         return wrapped_func
     return wrap

@@ -29,7 +29,7 @@ class Frame:
             self.vobjs[vobj_type][track_id] = new_vobj
         # update vobj
         vobj = self.vobjs[vobj_type][track_id]
-        vobj.update(data, self)
+        vobj.update(data)
 
         # update tracked and lost vobjs
         if data:

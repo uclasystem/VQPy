@@ -1,6 +1,6 @@
 """VObjBase implementation"""
 
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional, Set, Tuple
 
 from ..base.interface import VObjBaseInterface
 from ..function import infer
@@ -19,7 +19,7 @@ class VObjBase(VObjBaseInterface):
         self._track_length = 0
         self._datas: List[Optional[Dict]] = []
         self._registered_names: Set[str] = set()
-        self._registered_cross_vobj_names: Set[str] = set()
+        self._registered_cross_vobj_names: Dict[str, ] = {}
         self._working_infers: List[str] = []
         # NOTE: now @property instances are stored in the order of __dir__()
         for instance_name in self.__dir__():
@@ -41,7 +41,7 @@ class VObjBase(VObjBaseInterface):
     def getv(self,
              attr: str,
              index: int = -1,
-             frame: Optional[Frame] = None,
+             cross_vobj_args: Optional[Tuple] = None,
              specifications: Optional[Dict[str, str]] = None):
         """
         NOTE: Note the order in the following checking.
@@ -82,7 +82,7 @@ class VObjBase(VObjBaseInterface):
             elif attr in self._registered_names:
                 return getattr(self, attr)()
             elif attr in self._registered_cross_vobj_names:
-                return getattr(self, attr)(frame)
+                return getattr(self, attr)(*cross_vobj_args)
             else:
                 assert len(self._datas) > 0
                 self._working_infers.append(attr)
@@ -104,7 +104,7 @@ class VObjBase(VObjBaseInterface):
             else:
                 return None
 
-    def update(self, data: Optional[Dict], frame: Frame):
+    def update(self, data: Optional[Dict]):
         """Update data this frame to object"""
         if data is not None:
             self._datas.append(data.copy())
