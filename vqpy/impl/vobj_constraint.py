@@ -64,11 +64,13 @@ class VObjConstraint(VObjConstraintInterface):
         if len(vobjs) == 0:
             return []
         
-        # retrieve properties of other VObj types that are required by @cross_vobj_property
+        # retrieve properties of other VObj types that are 1. required by @cross_vobj_property 2. in filter_cons
         # and store them in a dictionary {property_name: List[Tuple(property1, property2, ...), ...]}
         # since all VObjs of the same type should share the same properties (even if there are multiple queries), we only need to retrieve the properties once, using information from any VObj of that type (use the first one here)
         cross_vobj_args = {}
         for cross_vobj_property in vobjs[0]._registered_cross_vobj_names.keys():
+            if cross_vobj_property not in self.filter_cons.keys():
+                continue
             # get the type of the other VObj and the properties required by the @cross_vobj_property
             other_vobj_type, other_vobj_input_fields = vobjs[0]._registered_cross_vobj_names[cross_vobj_property]
             other_vobjs = frame.get_tracked_vobjs(other_vobj_type)
@@ -76,6 +78,8 @@ class VObjConstraint(VObjConstraintInterface):
             for other_vobj in other_vobjs:
                 properties.append(tuple(other_vobj.getv(input_field) for input_field in other_vobj_input_fields))
             cross_vobj_args[cross_vobj_property] = properties
+       
+        # TODO: move cross_vobj_property's computation to here, also removes the need for passing cross_vobj_args to getv and continuing
         
         ret: List[VObjBaseInterface] = []
         for obj in vobjs:
