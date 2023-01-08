@@ -79,7 +79,13 @@ class VObjConstraint(VObjConstraintInterface):
                 properties.append(tuple(other_vobj.getv(input_field) for input_field in other_vobj_input_fields))
             cross_vobj_args[cross_vobj_property] = properties
        
-        # TODO: move cross_vobj_property's computation to here, also removes the need for passing cross_vobj_args to getv and continuing
+        # for each vobj, compute value of cross_vobj_property
+        # no longer need to pass cross_vobj_arg to getv and continuing
+        # In fact, all properties should be computed here, getv should only be responsible for retrieving the property value (instead of doing the computation when value is absent). This, however, requires building dependency graph for all vobj properties, we leave it for future work.
+        for obj in vobjs:
+            for property_name, func in self.filter_cons.items():
+                if property_name in obj._registered_cross_vobj_names.keys():
+                    getattr(obj, property_name)(cross_vobj_args[property_name])
         
         ret: List[VObjBaseInterface] = []
         for obj in vobjs:
@@ -92,10 +98,10 @@ class VObjConstraint(VObjConstraintInterface):
                 if type(func) == continuing:
                     # use property name to access the corresponding property values
                     # if property is not decorated with @cross_vobj_property, just use None (will be ignored if the property is decorated with @property)
-                    ok = func(obj, property_name, cross_vobj_args = cross_vobj_args.get(property_name, None))
+                    ok = func(obj, property_name)
                 else:
                     # same for getv
-                    it = obj.getv(property_name, cross_vobj_args = cross_vobj_args.get(property_name, None))
+                    it = obj.getv(property_name)
                     if it is None or not func(it):
                         ok = False
                         break

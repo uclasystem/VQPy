@@ -41,7 +41,6 @@ class VObjBase(VObjBaseInterface):
     def getv(self,
              attr: str,
              index: int = -1,
-             cross_vobj_args: Optional[Tuple] = None,
              specifications: Optional[Dict[str, str]] = None):
         """
         NOTE: Note the order in the following checking.
@@ -81,8 +80,6 @@ class VObjBase(VObjBaseInterface):
                 return getattr(self, '__record_' + attr)
             elif attr in self._registered_names:
                 return getattr(self, attr)()
-            elif attr in self._registered_cross_vobj_names:
-                return getattr(self, attr)(cross_vobj_args)
             else:
                 assert len(self._datas) > 0
                 self._working_infers.append(attr)

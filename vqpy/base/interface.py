@@ -28,7 +28,6 @@ class VObjBaseInterface(object):
     def getv(self,
              attr: str,
              index: int = -1,
-             cross_vobj_args: Optional[Tuple] = None,
              specifications: Optional[Dict[str, str]] = None):
         """
         attr: attribute name.
