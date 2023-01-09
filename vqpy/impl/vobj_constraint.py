@@ -114,6 +114,8 @@ class VObjConstraint(VObjConstraintInterface):
     def _compute_cross_vobj_property(
         self, frame: FrameInterface, vobjs: VObjBaseInterface, conditions
     ) -> None:
+        """Compute cross_vobj_property's used in the conditions for the given
+        VObjs"""
         if len(vobjs) == 0:
             return
 

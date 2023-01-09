@@ -72,6 +72,13 @@ class VObjConstraintInterface(object):
         """apply the constraint on a list of VObj instances"""
         raise NotImplementedError
 
+    def _compute_cross_vobj_property(
+        self, frame: FrameInterface, vobjs: VObjBaseInterface, conditions
+    ) -> None:
+        """Compute cross_vobj_property's used in the conditions for the given
+        VObjs"""
+        raise NotImplementedError
+
 
 class FrameInterface(object):
     def __init__(self, ctx: FrameStream):
