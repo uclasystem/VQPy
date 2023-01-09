@@ -60,7 +60,9 @@ def launch(cls_name,
     for frame_id in tqdm(range(1, stream.n_frames + 1)):
         frame_image = stream.next()
         outputs = detector.inference(frame_image)
-        _, _, frame = tracker.update(outputs, frame)    # frame contains all vobjs, enough for all queries
+        _, _, frame = tracker.update(outputs, frame)
+        # frame contains all vobjs, enough for all queries
+        # we can drop the returned tracked/lost VObj list
         for task in tasks:
             task.vqpy_update(frame)
 

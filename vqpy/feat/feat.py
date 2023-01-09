@@ -137,11 +137,13 @@ def cross_vobj_property(
     # other possible options could be user-specified number
     def wrap(func: Callable):
         @functools.wraps(func)
-        def wrapped_func(self: VObjBaseInterface, cross_vobj_arg: Optional[List] = None):
-            # somehow find all vobjs of specified type and their properties
-            # pass the properties to func and return value
-            # parameter other_vobjs has default value None in order to maintain "same" interface with @property
-            # this compatibility is mainly used in VObjBase.__init__ at instance()
+        def wrapped_func(
+            self: VObjBaseInterface,
+            cross_vobj_arg: Optional[List] = None
+        ):
+            # parameter cross_vobj_arg has default value None to maintain
+            # the "same" interface with @property upon being called directly
+            # this compatibility is used in VObjBase.__init__ at instance()
             if len(self._datas) > 0:
                 vidx = '__record_' + func.__name__
                 aidx = '__index_' + func.__name__
@@ -154,8 +156,9 @@ def cross_vobj_property(
                     return value
             elif func.__name__ not in self._registered_cross_vobj_names:
                 # initialization
-                # register function name, required VObj type and required fields
-                self._registered_cross_vobj_names[func.__name__] = (vobj_type, vobj_input_fields)
+                # register function name, required VObj type and fields
+                self._registered_cross_vobj_names[func.__name__] = \
+                    (vobj_type, vobj_input_fields)
                 return None
         return wrapped_func
     return wrap

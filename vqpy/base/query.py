@@ -2,11 +2,8 @@
 
 from __future__ import annotations
 
-from typing import List, Dict
 from ..base.interface import (
-    VObjBaseInterface,
     VObjConstraintInterface,
-    VObjGeneratorType,
     OutputConfig,
     FrameInterface
 )

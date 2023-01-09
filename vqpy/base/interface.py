@@ -1,7 +1,7 @@
 """Interfaces that requires implementations in impl/"""
 
 from __future__ import annotations
-from typing import Dict, List, Optional, Callable, Set, Tuple
+from typing import Dict, List, Optional, Callable, Set
 
 from ..utils.video import FrameStream
 
@@ -67,7 +67,7 @@ class VObjConstraintInterface(object):
     def select(self, objs: List[VObjBaseInterface]) -> VObjBaseInterface:
         """select one vobject from the constraint"""
         raise NotImplementedError
-    
+
     def apply(self, frame: FrameInterface) -> List[Dict]:
         """apply the constraint on a list of VObj instances"""
         raise NotImplementedError

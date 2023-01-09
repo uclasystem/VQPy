@@ -1,5 +1,3 @@
-from typing import List, Optional, Tuple
-
 class continuing:
     """Checks whether the condition function continues to be true
     for a certain duration.

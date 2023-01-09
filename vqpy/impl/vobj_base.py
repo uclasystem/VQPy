@@ -1,10 +1,9 @@
 """VObjBase implementation"""
 
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Dict, List, Optional, Set
 
 from ..base.interface import VObjBaseInterface
 from ..function import infer
-from ..impl.frame import Frame
 from ..utils.video import FrameStream
 
 
@@ -59,8 +58,9 @@ class VObjBase(VObjBaseInterface):
 
         __static_ can be used to store properties that are not time-related.
         e.g. color of object, aggregated properties
-        
-        frame: the frame to be used for inference, used when the attribute is decorated with @cross_vobj_property
+
+        frame: the frame to be used for inference,used when the property is
+        decorated with @cross_vobj_property
         """
         # patchwork to support __static_
         if hasattr(self, '__static_' + attr):
