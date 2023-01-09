@@ -60,32 +60,8 @@ class VObjConstraint(VObjConstraintInterface):
         vobj_type = next((vobj_type for vobj_type in frame.vobjs.keys() if filter_func(vobj_type)), None)
         # all VObjs of the desired type
         vobjs = frame.get_tracked_vobjs(vobj_type)
-        # return empty list if no VObj of the desired type
-        if len(vobjs) == 0:
-            return []
         
-        # retrieve properties of other VObj types that are 1. required by @cross_vobj_property 2. in filter_cons
-        # and store them in a dictionary {property_name: List[Tuple(property1, property2, ...), ...]}
-        # since all VObjs of the same type should share the same properties (even if there are multiple queries), we only need to retrieve the properties once, using information from any VObj of that type (use the first one here)
-        cross_vobj_args = {}
-        for cross_vobj_property in vobjs[0]._registered_cross_vobj_names.keys():
-            if cross_vobj_property not in self.filter_cons.keys():
-                continue
-            # get the type of the other VObj and the properties required by the @cross_vobj_property
-            other_vobj_type, other_vobj_input_fields = vobjs[0]._registered_cross_vobj_names[cross_vobj_property]
-            other_vobjs = frame.get_tracked_vobjs(other_vobj_type)
-            properties = []
-            for other_vobj in other_vobjs:
-                properties.append(tuple(other_vobj.getv(input_field) for input_field in other_vobj_input_fields))
-            cross_vobj_args[cross_vobj_property] = properties
-       
-        # for each vobj, compute value of cross_vobj_property
-        # no longer need to pass cross_vobj_arg to getv and continuing
-        # In fact, all properties should be computed here, getv should only be responsible for retrieving the property value (instead of doing the computation when value is absent). This, however, requires building dependency graph for all vobj properties, we leave it for future work.
-        for obj in vobjs:
-            for property_name, func in self.filter_cons.items():
-                if property_name in obj._registered_cross_vobj_names.keys():
-                    getattr(obj, property_name)(cross_vobj_args[property_name])
+        self._compute_cross_vobj_property(frame, vobjs, self.filter_cons)
         
         ret: List[VObjBaseInterface] = []
         for obj in vobjs:
@@ -119,6 +95,31 @@ class VObjConstraint(VObjConstraintInterface):
         """apply the constraint on a list of VObj instances"""
         # TODO: optimize the procedure
         filtered = self.filter(frame)
+        self._compute_cross_vobj_property(frame, filtered, self.select_cons)
         selected = self.select(filtered)
         filtered_ids = [obj.getv("track_id") for obj in filtered]
         return selected, filtered_ids
+
+    def _compute_cross_vobj_property(self, frame, vobjs, conditions) -> None:
+        if len(vobjs) == 0:
+            return
+
+        # retrieve properties of other VObj types that are 1. required by @cross_vobj_property 2. in filter/select_cons
+        # and store them in a dictionary {property_name: List[Tuple(property1, property2, ...), ...]}
+        # since all VObjs of the same type should share the same properties (even if there are multiple queries), we only need to retrieve the properties once, using information from any VObj of that type (use the first one here)
+        cross_vobj_args = {}
+        for cross_vobj_property in vobjs[0]._registered_cross_vobj_names.keys():
+            if cross_vobj_property not in conditions.keys():
+                continue
+            other_vobj_type, other_vobj_input_fields = vobjs[0]._registered_cross_vobj_names[cross_vobj_property]
+            other_vobjs = frame.get_tracked_vobjs(other_vobj_type)
+            properties = []
+            for other_vobj in other_vobjs:
+                properties.append(tuple(other_vobj.getv(input_field) for input_field in other_vobj_input_fields))
+            cross_vobj_args[cross_vobj_property] = properties
+
+        # for each vobj, compute value of cross_vobj_property
+        for obj in vobjs:
+            for property_name, _ in conditions.items():
+                if property_name in obj._registered_cross_vobj_names.keys():
+                    getattr(obj, property_name)(cross_vobj_args[property_name])
