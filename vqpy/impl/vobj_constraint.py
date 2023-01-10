@@ -70,7 +70,9 @@ class VObjConstraint(VObjConstraintInterface):
         vobjs = frame.get_tracked_vobjs(vobj_type)
 
         # compute cross_vobj_property's in the VObjs of the desired type
-        self._compute_cross_vobj_property(frame, vobjs, self.filter_cons)
+        self._compute_cross_vobj_property(
+            frame, vobjs, self.filter_cons.keys()
+        )
 
         ret: List[VObjBaseInterface] = []
         for obj in vobjs:
@@ -106,13 +108,15 @@ class VObjConstraint(VObjConstraintInterface):
         # compute cross_vobj_property's in the filtered VObjs, for potential
         # usage in select_cons
         # select_cons are provided so only those being used will be computed
-        self._compute_cross_vobj_property(frame, filtered, self.select_cons)
+        self._compute_cross_vobj_property(
+            frame, filtered, self.select_cons.keys() - self.filter_cons.keys()
+        )
         selected = self.select(filtered)
         filtered_ids = [obj.getv("track_id") for obj in filtered]
         return selected, filtered_ids
 
     def _compute_cross_vobj_property(
-        self, frame: FrameInterface, vobjs: VObjBaseInterface, conditions
+        self, frame: FrameInterface, vobjs: VObjBaseInterface, condition_names
     ) -> None:
         """Compute cross_vobj_property's used in the conditions for the given
         VObjs"""
@@ -139,7 +143,7 @@ class VObjConstraint(VObjConstraintInterface):
         for cross_vobj_property in \
                 vobjs[0]._registered_cross_vobj_names.keys():
             # only compute properties used in the conditions
-            if cross_vobj_property not in conditions.keys():
+            if cross_vobj_property not in condition_names:
                 continue
             other_vobj_type, other_vobj_input_fields = \
                 vobjs[0]._registered_cross_vobj_names[cross_vobj_property]
@@ -156,6 +160,6 @@ class VObjConstraint(VObjConstraintInterface):
 
         # for each vobj, compute value of cross_vobj_property
         for obj in vobjs:
-            for property_name, _ in conditions.items():
+            for property_name in condition_names:
                 if property_name in obj._registered_cross_vobj_names.keys():
                     getattr(obj, property_name)(cross_vobj_args[property_name])
