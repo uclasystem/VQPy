@@ -64,7 +64,8 @@ class VObjConstraintInterface(object):
         """filter the list of vobjects from the constraint"""
         raise NotImplementedError
 
-    def select(self, objs: List[VObjBaseInterface]) -> VObjBaseInterface:
+    def select(self, objs: List[VObjBaseInterface], frame: FrameInterface) \
+            -> VObjBaseInterface:
         """select one vobject from the constraint"""
         raise NotImplementedError
 

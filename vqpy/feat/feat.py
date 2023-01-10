@@ -121,9 +121,13 @@ def cross_vobj_property(
         ):
     """Decorator for cross-object property computation.
 
-    Wrapper for cross-object property computation. Retrieves list of properties
-    of VObjs of specified type and passes them to the function, as
-    `List[Tuple(property1, property2, ...), ...]`
+    Wrapper for cross-object property computation. Retrieves `cross_vobj_arg`,
+    a list of properties of VObjs of specified type, and passes them to the
+    function being decorated. `cross_vobj_arg` has structure:
+    `List[Tuple(property1, property2, ...) for vobj1, Tuple for vobj2, ...]`.
+
+    The function that computes the property should accept two arguments:
+    `self` and `cross_vobj_arg` (positional).
 
     Attributes:
     vobj_type: VObjGeneratorType

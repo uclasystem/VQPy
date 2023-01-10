@@ -95,8 +95,15 @@ class VObjConstraint(VObjConstraintInterface):
                 ret.append(obj)
         return ret
 
-    def select(self, objs: List[VObjBaseInterface]) -> List[Dict]:
+    def select(self, objs: List[VObjBaseInterface], frame: FrameInterface) \
+            -> List[Dict]:
         """select the required informations from the constraints"""
+        # compute cross_vobj_property's in the filtered VObjs, for potential
+        # usage in select_cons
+        # select_cons are provided so only those being used will be computed
+        self._compute_cross_vobj_property(
+            frame, objs, self.select_cons.keys() - self.filter_cons.keys()
+        )
         return [{key: postproc(x.getv(key))
                  for key, postproc in self.select_cons.items()}
                 for x in objs]
@@ -105,18 +112,12 @@ class VObjConstraint(VObjConstraintInterface):
         """apply the constraint on a list of VObj instances"""
         # TODO: optimize the procedure
         filtered = self.filter(frame)
-        # compute cross_vobj_property's in the filtered VObjs, for potential
-        # usage in select_cons
-        # select_cons are provided so only those being used will be computed
-        self._compute_cross_vobj_property(
-            frame, filtered, self.select_cons.keys() - self.filter_cons.keys()
-        )
-        selected = self.select(filtered)
+        selected = self.select(filtered, frame)
         filtered_ids = [obj.getv("track_id") for obj in filtered]
         return selected, filtered_ids
 
     def _compute_cross_vobj_property(
-        self, frame: FrameInterface, vobjs: VObjBaseInterface, condition_names
+        self, frame: FrameInterface, vobjs: VObjBaseInterface, property_names
     ) -> None:
         """Compute cross_vobj_property's used in the conditions for the given
         VObjs"""
@@ -143,7 +144,7 @@ class VObjConstraint(VObjConstraintInterface):
         for cross_vobj_property in \
                 vobjs[0]._registered_cross_vobj_names.keys():
             # only compute properties used in the conditions
-            if cross_vobj_property not in condition_names:
+            if cross_vobj_property not in property_names:
                 continue
             other_vobj_type, other_vobj_input_fields = \
                 vobjs[0]._registered_cross_vobj_names[cross_vobj_property]
@@ -160,6 +161,6 @@ class VObjConstraint(VObjConstraintInterface):
 
         # for each vobj, compute value of cross_vobj_property
         for obj in vobjs:
-            for property_name in condition_names:
+            for property_name in property_names:
                 if property_name in obj._registered_cross_vobj_names.keys():
                     getattr(obj, property_name)(cross_vobj_args[property_name])
