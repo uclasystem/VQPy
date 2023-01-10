@@ -48,13 +48,7 @@ class Baggage(vqpy.VObjBase):
         owner_id = None
         # with new implementation of @cross_vobj_property and VObj.update, only
         # tracked VObjs will go into the filter and compute property "owner"
-        # Thus baggage_tlbr will never be None
-        # # get list of person_ids
-        # person_ids = next(zip(*person_ids_tlbrs))
-        # # return previous owner, if baggage is not present in current frame
-        # # return None is previous owner is not present in current frame
-        # if baggage_tlbr is None:
-        #     return prev_owner if prev_owner in person_ids else None
+        # Thus no need to handle situation of baggage_tlbr being None
 
         # set threshold to baggage's width
         threshold = (baggage_tlbr[3] - baggage_tlbr[1])

@@ -121,13 +121,17 @@ def cross_vobj_property(
         ):
     """Decorator for cross-object property computation.
 
-    Wrapper for cross-object property computation. Retrieves `cross_vobj_arg`,
-    a list of properties of VObjs of specified type, and passes them to the
-    function being decorated. `cross_vobj_arg` has structure:
-    `List[Tuple(property1, property2, ...) for vobj1, Tuple for vobj2, ...]`.
+    Wrapper for cross-object property computation.
 
-    The function that computes the property should accept two arguments:
+    The property function being decorated should accept two arguments:
     `self` and `cross_vobj_arg` (positional).
+    During execution, VQPy will pass `cross_vobj_arg`, a list of properties of
+    VObjs of specified type, to the property function being decorated.
+
+    `cross_vobj_arg` has structure:
+    `List[Tuple(property1, property2, ...) for vobj1, Tuple for vobj2, ...]`,
+    where property1, property2 are values of property names listed in
+    `vobj_input_fields`, in order; vobj1, vobj2 are VObjs of type `vobj_type`.
 
     Attributes:
     vobj_type: VObjGeneratorType
