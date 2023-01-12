@@ -88,4 +88,5 @@ class YOLOXDetector(DetectorBase):
                          "class_id": int(class_id.item())})
         return rets
 
+
 register("yolox", YOLOXDetector, "yolox_x.pth")
