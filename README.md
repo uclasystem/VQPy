@@ -8,6 +8,17 @@ VQPy is still under active development. VQPy compiler, which generates a query p
 
 ## Getting Started
 
+<details>
+<summary>Install prerequisites</summary>
+Install <a href="https://github.com/Megvii-BaseDetection/YOLOX">YOLOX</a> from source.
+
+```shell
+git clone https://github.com/Megvii-BaseDetection/YOLOX.git
+cd YOLOX
+pip3 install -v -e .
+```
+</details>
+
 ### Basic usage
 
 In order to declare a video query with VQPy, users need to extend two classes defined in VQPy, namely `Query` and `VObj`. `VObj` defines the objects of interest (e.g., cars, humans, animals, etc.) in one or more video streams, and `Query` defines the video query.  
