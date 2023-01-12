@@ -1,7 +1,5 @@
 import argparse
 import vqpy
-from yolox_detector import YOLOXDetector
-from vqpy.detector.logger import register
 
 
 def make_parser():
@@ -153,7 +151,6 @@ class CountPersonHeadRight(CountPersonOnCrosswalk):
 
 if __name__ == '__main__':
     args = make_parser().parse_args()
-    register("yolox", YOLOXDetector, "yolox_x.pth")
     vqpy.launch(cls_name=vqpy.COCO_CLASSES,
                 cls_type={"person": Person},
                 tasks=[CountPersonHeadLeft(), CountPersonHeadRight()],

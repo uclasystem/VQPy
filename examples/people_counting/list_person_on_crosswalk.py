@@ -2,8 +2,6 @@ import argparse
 import numpy as np
 import vqpy
 from vqpy.function.logger import vqpy_func_logger
-from yolox_detector import YOLOXDetector
-from vqpy.detector.logger import register
 
 
 def make_parser():
@@ -70,7 +68,6 @@ class ListPersonOnCrosswalk(vqpy.QueryBase):
 
 if __name__ == '__main__':
     args = make_parser().parse_args()
-    register("yolox", YOLOXDetector, "yolox_x.pth")
     vqpy.launch(cls_name=vqpy.COCO_CLASSES,
                 cls_type={"person": Pedestrian},
                 tasks=[ListPersonOnCrosswalk()],
