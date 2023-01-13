@@ -14,7 +14,7 @@ Loitering is the activity of remaining in an area for no obvious reason. In this
 
 <img src="./README.assets/region.png" alt="region of interest" style="zoom: 30%;" />
 
-To find all such people, first define a `Person` class and specify that COCO class "person" should map to VObj type `Person`:
+To find all such people, first define a `Person` class and specify COCO class "person" should map to VObj type `Person`:
 
 ```python
 class Person(vqpy.VObjBase):
@@ -57,9 +57,11 @@ select_cons = {
 
 ## Run example
 
-To run locally
+[Video](https://youtu.be/EuLMrUFNRxQ) needs to be downloaded to local before running the example.
 
-```python
+Local environment:
+
+```shell
 python VQPy/examples/loitering/main.py
     --path videos/loitering/loitering.mp4
     --save_folder vqpy_outputs/loitering
