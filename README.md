@@ -2,22 +2,37 @@
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-brightgreen.svg)](https://github.com/uclasystem/VQPy/blob/main/LICENSE)
 
-VQPy is an object-oriented language for modern video analytics. With VQPy, users can express their video queries in a composable and reusable manner with Python. 
+VQPy is an object-oriented language for modern video analytics. With VQPy, users can express their video queries in a composable and reusable manner with Python.
 
 VQPy is still under active development. VQPy compiler, which generates a query plan with optimized performance for users' video analytics applications, is working in progress. With VQPy compiler, users can simply focus on the declaration of video queries for their own applications, and multiple optimizations defined in the compiler will be transparently applied to the user’s video analytics pipeline.
 
 ## Getting Started
 
-<details>
-<summary>Install prerequisites</summary>
-Install <a href="https://github.com/Megvii-BaseDetection/YOLOX">YOLOX</a> from source.
+### Setup
+
+Install PyTorch (>=1.7 as required by YOLOX).
+
+Then install [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX") from source.
 
 ```shell
 git clone https://github.com/Megvii-BaseDetection/YOLOX.git
 cd YOLOX
 pip3 install -v -e .
 ```
-</details>
+
+Other dependencies of VQPy
+
+```shell
+pip3 install lap cython_bbox shapely
+```
+
+Download VQPy
+
+```shell
+git clone https://github.com/uclasystem/VQPy.git
+```
+
+VQPy is not yet available for install, please import `vqpy` from directory `VQPy/vqpy` (i.e. make `VQPy/` available in your working directory).
 
 ### Basic usage
 
