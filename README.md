@@ -16,9 +16,7 @@ In order to declare a video query with VQPy, users need to extend two classes de
 
 #### Define a `VObj`
 
-Users can define their own objects of interest, as well as the property in the objects they hope to query on, with a `VObj` class. To define a `VObj` instance, users are required to inherit the `vqpy.VObjBase` class; to define a property, the definition should start with a `@vqpy.property` decorator.
-
-The definition should start with a `@vqpy.property` decorator.
+Users can define their own objects of interest, as well as the property in the objects they hope to query on, with a `VObj` class. To define a `VObj` instance, users are required to inherit the `vqpy.VObjBase` class; to define a property, the definition should start with a `@vqpy.property` decorator. Specifically, if a property is related to multiple objects, the definition should use `@vqpy.cross_object_property` instead of `@vqpy.property`.
 
 For example, if we are interested in the vehicle object in the video, and want to query the license plate. We can define a `Vehicle` class as below.
 
@@ -31,17 +29,37 @@ class Vehicle(vqpy.VObjBase):
         return self.infer('license_plate', {'license_plate': 'openalpr'})
 ```
 
-Here you can see a builtin interface `infer` provided by the library. There are two basic interfaces `infer` and `getv`, both of which are used to infer an attribute, typically an user-defined or pre-defined property in most cases. There are two differences in the functions: `getv` can retrieve values in historic frames if the property is marked by `@vqpy.stateful` decorator; `getv` consider user-defined names first and `infer` directly look up the library.
+And if we are interested in the closest person to each of the `Baggage` object, we can declare a `closest_person` property as below. The `track_id` and `tlbr` of all `Person` are passed as argument accordingly.
 
-We also have some other decorators for defining properties, including `@vqpy.postproc` and `@vqpy.cross_object_property`. The former decorator provides basic postprocessing functions. For instance, returning the modal value of the results in past 10 frames. The latter decorator can help user define cross-object properties, so that users can track values like distances between all pairs of people and baggage.
+```python
+class Person(vqpy.VObjBase):
+    pass
 
-For more details on how to use the decorators to define one's own object, please refer to our API document. You can also refer to our demos to see several example implementations of concerned objects.
+
+class Baggage(vqpy.VObjBase):
+
+    @vqpy.property()
+    @vqpy.cross_vobj_property(
+        vobj_type=Person, vobj_num="ALL",
+        vobj_input_fields=("track_id", "tlbr")
+    )
+    # function decorator responsible for retrieving list of properties
+    # Person_id and Person_tlbr given as a list of track_id's and tlbr's
+    def closest_person(self, person_ids, person_tlbrs):
+        ...
+```
+
+Also, we can see a builtin interface `infer` provided by the library in the first example. In VQPy, there are two basic interfaces `infer` and `getv`, both of which are used to infer an attribute, typically an user-defined or pre-defined property in most cases.
+
+There are two differences in the functions: `getv` can retrieve values in historic frames if the property is marked by `@vqpy.stateful` decorator; `getv` consider user-defined names first and `infer` directly look up the library. Consequently, `infer` is mostly used when implementing the properties to avoid circular reference, and `getv` can be used as the interface to access the data within this object.
+
+We also have some other decorators to simplify the definition of properties, like `@vqpy.postproc`. This decorator provides basic postprocessing functions. For instance, returning the modal value of the results in past 10 frames. For more details on how to use the decorators, please refer to our API document (TODO). You can also refer to our demos to see several example implementations of concerned objects.
 
 #### Define a `Query`
 
 Users can express their queries through SQL-like constraints with `VObjConstraint`, which is a return value of the `setting` method in their `Query` class. In `VObjConstraint`, users can specify query constraints on the interested object with `filter_cons`, and `select_cons` gives the projection of the properties the query shall return.
 
-Moreover, the user can provide some functions when The projected properties will pass a postprocess function provided by the user, which is the identity function by default. 
+Moreover, the user can provide some functions. In `filter_cons`, the functions are boolean, and objects whose corresponding value has a `False` return will not be selected. In `select_cons`, the returned value will pass the function provided. By default, these functions are all identity functions.
 
 The code below demonstrates a query that selects all the `Vehicle` objects whose velocity is greater than 0.1, and chooses the two properties of `track_id`  and `license_plate` for return.
 
@@ -101,6 +119,32 @@ vqpy.launch(cls_name=vqpy.COCO_CLASSES, # detection class
 
 Under the hood, VQPy will automatically select an object detection model that outputs the specified `cls_name`, and decide the workflow to generate the object properties. Multiple video optimizations will be conducted transparently to improve the end-to-end video query performance.
 
+### Customization
+
+In VQPy, users can also add their own function and models by using the built-in interfaces. These interfaces are also used for functions and models in the library.
+
+#### Library property
+
+To register a library property, we can use `@vqpy.vqpy_func_logger` decorator, with the following interface, as in the following example:
+
+```python
+def vqpy_func_logger(input_fields, output_fields, past_fields,
+                     specifications=None, required_length=-1):
+    """ input_fields: required fields in this frame.
+        output_fields: fields the function can generate.
+        past_fields: required fields in past frames.
+        specifications: preference of the function.
+        required_length: the required track length for this function. """
+    ...
+
+@vqpy_func_logger(['tlbr'], ['bottom_center'], [], required_length=1)
+def bottom_center_coordinate(obj, tlbr):
+    """compute the coordinate of bottom center of the bounding box"""
+    x = (tlbr[0] + tlbr[2]) / 2
+    y = tlbr[3]
+    return [(x, y)]
+```
+
 #### Detector and tracker
 
 Under normal conditions, users do not need to provide a detector implementation. However, if the user have a detector, they can inherit `vqpy.detector.DetectorBase` and implement the required interfaces.
@@ -122,7 +166,9 @@ class DetectorBase(object):
         raise NotImplementedError
 ```
 
-There are two level of trackers in VQPy. The surface level tracker stores the `VObj` instances by classes, and this is where `VObj` instances are created. For the default surface level tracker, different classes will be tracked separately using the ground level tracker. This level of tracker should generate the `track_id` field based on the provided detection result in this frame. Clearly, these trackers should be able to memorize historic detection results. To implement a method generating `track_id`, one should inherit `GroundTrackerBase` and register it to our backend. The interface of the ground level tracker is show below:
+There are two level of trackers in VQPy. The surface level tracker stores the `VObj` instances by classes, and this is where `VObj` instances are created. For the default surface level tracker, different classes will be tracked separately using the ground level tracker. This level of tracker should generate the `track_id` field based on the provided detection result in this frame. Clearly, these trackers should be able to memorize historic detection results.
+
+To implement a customized method generating `track_id`, one should inherit `GroundTrackerBase` and register it to our backend. The interface of the ground level tracker is show below:
 
 ```python
 class GroundTrackerBase(object):
@@ -141,32 +187,9 @@ class GroundTrackerBase(object):
         ...
 ```
 
-For the registration details, please refer to our API document.
+For the registration details, please refer to our API document (TODO).
 
-#### Customization
-
-In VQPy, users can also add their own function and models by using the built-in interfaces. These interfaces are also used for functions and models in the library. To register a library property, we can use `@vqpy.vqpy_func_logger` decorator, with the following interface, as in the following example:
-
-```python
-def vqpy_func_logger(input_fields, output_fields, past_fields,
-                     specifications=None, required_length=-1):
-    """ input_fields: required fields in this frame.
-        output_fields: fields the function can generate.
-        past_fields: required fields in past frames.
-        specifications: preference of the function.
-        required_length: the required track length for this function. """
-    ...
-
-@vqpy_func_logger(['tlbr'], ['bottom_center'], [], required_length=1)
-def bottom_center_coordinate(obj, tlbr):
-    """compute the coordinate of bottom center of the bounding box"""
-    x = (tlbr[0] + tlbr[2]) / 2
-    y = tlbr[3]
-    return [(x, y)]
-
-```
-
-There are also several interfaces for registering detector (`vqpy.detector.register`) and tracker (TODO) . For the detailed interface and usage, please refer to our API document.
+There are also several interfaces for registering detector (`vqpy.detector.register`) and tracker (TODO) . For the detailed interface and usage, please refer to our API document (TODO).
 
 ## Examples
 
