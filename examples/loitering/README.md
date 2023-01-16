@@ -8,7 +8,7 @@ You can follow the instructions [here](../../vqpy/README.md) to prepare your env
 
 [Video](https://youtu.be/EuLMrUFNRxQ) needs to be downloaded to local before running the example.
 
-Local environment:
+### Running as a script
 
 ```shell
 python VQPy/examples/loitering/main.py
@@ -18,9 +18,11 @@ python VQPy/examples/loitering/main.py
 ```
 
 - `--path`: path of video;
-- `--save_folder`: the folder that you preferred to save the query result;
+- `--save_folder`: the folder to save query result;
 - `-d`: directory containing pre-trained models (only model for YOLOX is used).
 
-Or use [demo.ipynb](./demo.ipynb). Notebook tested in Google Colab, it's advised to use a unused, clean Python3.8 environment if you prefer to run it locally.
+### Run in Jupyter notebook
 
-Please see the Jupyter notebook for more details about the query.
+Or run [demo.ipynb](./demo.ipynb). The notebook also contains more details about the query.
+
+Notebook is tested in Google Colab, it's advised to use a unused Python3.8 environment if you prefer to run it locally.
