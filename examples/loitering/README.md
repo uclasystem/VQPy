@@ -1,14 +1,14 @@
 # Detect people loitering example
 
-## Setup
-
-You can follow the instructions [here](../../vqpy/README.md) to prepare your environment for VQPy. No other dependency is used.
-
 ## Run example
 
-[Video](https://youtu.be/EuLMrUFNRxQ) needs to be downloaded to local before running the example.
+[Video](https://youtu.be/EuLMrUFNRxQ) needs to be downloaded before running the example.
 
 ### Running as a script
+
+You can follow the instructions [here](../../README.md#installation) to prepare your environment for VQPy. No other dependency is used.
+
+Then run the script with arguments:
 
 ```shell
 python VQPy/examples/loitering/main.py
