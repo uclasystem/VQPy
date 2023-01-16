@@ -18,6 +18,10 @@ Besides, please use below command to install other dependencies for this example
 pip install webcolors ColorDetect opencv-python
 ```
 
+## Query Logic
+
+This basic demo demonstrates how to use VQPy to generate a query 
+
 ## Download Dataset
 TO BE ADDED.
 

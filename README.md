@@ -29,7 +29,7 @@ class Vehicle(vqpy.VObjBase):
         return self.infer('license_plate', {'license_plate': 'openalpr'})
 ```
 
-And if we are interested in the closest person to each of the `Baggage` object, we can declare a `closest_person` property as below. The `track_id` and `tlbr` of all `Person` are passed as argument accordingly.
+And if we are interested in the closest person to each of the `Baggage` object, we can declare a `closest_person` property as below. The `track_id` and `tlbr` of all `Person` objects are passed as argument accordingly.
 
 ```python
 class Person(vqpy.VObjBase):
@@ -51,15 +51,15 @@ class Baggage(vqpy.VObjBase):
 
 Also, we can see a builtin interface `infer` provided by the library in the first example. In VQPy, there are two basic interfaces `infer` and `getv`, both of which are used to infer an attribute, typically an user-defined or pre-defined property in most cases.
 
-There are two differences in the functions: `getv` can retrieve values in historic frames if the property is marked by `@vqpy.stateful` decorator; `getv` consider user-defined names first and `infer` directly look up the library. Consequently, `infer` is mostly used when implementing the properties to avoid circular reference, and `getv` can be used as the interface to access the data within this object.
+There are two differences in the functions: `getv` can retrieve values in historic frames using `object.getv(property, index=)` if the property is marked by `@vqpy.stateful` decorator; `getv` consider user-defined names first and `infer` directly look up the library. Consequently, `infer` is mostly used when implementing the properties to avoid circular reference, and `getv` can be used as the interface to access the data within this object.
 
-We also have some other decorators to simplify the definition of properties, like `@vqpy.postproc`. This decorator provides basic postprocessing functions. For instance, returning the modal value of the results in past 10 frames. For more details on how to use the decorators, please refer to our API document (TODO). You can also refer to our demos to see several example implementations of concerned objects.
+We also have some other decorators to simplify the definition of properties, like `@vqpy.postproc`. This decorator provides basic postprocessing functions. For instance, returning the modal value of the results in past 10 frames. For more details on how to use the decorators, please refer to our API document (TODO). You can also refer to our [demos](https://github.com/uclasystem/VQPy/blob/main/README.md#customization) to see several example implementations of concerned objects.
 
 #### Define a `Query`
 
 Users can express their queries through SQL-like constraints with `VObjConstraint`, which is a return value of the `setting` method in their `Query` class. In `VObjConstraint`, users can specify query constraints on the interested object with `filter_cons`, and `select_cons` gives the projection of the properties the query shall return.
 
-Moreover, the user can provide some functions. In `filter_cons`, the functions are boolean, and objects whose corresponding value has a `False` return will not be selected. In `select_cons`, the returned value will pass the function provided. By default, these functions are all identity functions.
+Moreover, users can provide some functions for the constraints and projections. In `filter_cons`, the functions should be boolean, and objects whose corresponding property has a `False` return value will not be selected. In `select_cons`, these functions serve as the postprocessing of the property value, and users can simply set the value to `None` if they want to output the value directly.
 
 The code below demonstrates a query that selects all the `Vehicle` objects whose velocity is greater than 0.1, and chooses the two properties of `track_id`  and `license_plate` for return.
 
@@ -104,7 +104,7 @@ class People_loitering_query(vqpy.QueryBase):
 
 #### Launch the task
 
-After declaring `VObj` and `Query`, users should call the `vqpy.launch` function to deploy the video query, below is an example of this interface. Users should specify the detector class they expect, and map the object detection result to the defined VObj types.
+After declaring `VObj` and `Query`, users should call the `vqpy.launch` function to deploy the video query, below is an example of this interface. Users should specify the detection class they expect, and map the object detection result to the defined VObj types.
 
 ```python
 vqpy.launch(cls_name=vqpy.COCO_CLASSES, # detection class
@@ -121,7 +121,7 @@ Under the hood, VQPy will automatically select an object detection model that ou
 
 ### Customization
 
-In VQPy, users can also add their own function and models by using the built-in interfaces. These interfaces are also used for functions and models in the library.
+In VQPy, users can also add their own function and models by using the built-in interfaces. These interfaces are also used for functions and models in the library. The following sections gives a general view on customization, but for the detailed usage, please refer to our API document (TODO).
 
 #### Library property
 
@@ -145,13 +145,13 @@ def bottom_center_coordinate(obj, tlbr):
     return [(x, y)]
 ```
 
-#### Detector and tracker
+#### Detector
 
-Under normal conditions, users do not need to provide a detector implementation. However, if the user have a detector, they can inherit `vqpy.detector.DetectorBase` and implement the required interfaces.
+Under normal conditions, users do not need to provide a detector implementation. However, if the user have a detector, they can inherit `vqpy.detector.DetectorBase` and implement the required interfaces, and use `vqpy.detector.register` to register the detector. The return value of `inference` should be a list of dictionaries, representing the properties and the corresponding value for each detected object.
 
 ```python
 class DetectorBase(object):
-    """The base class of all predictors"""
+    """The base class of all detectors"""
     cls_names = None        # the class names of the classification
     output_fields = []      # the list of data fields the predictor can provide
 
@@ -166,9 +166,11 @@ class DetectorBase(object):
         raise NotImplementedError
 ```
 
+#### Tracker
+
 There are two level of trackers in VQPy. The surface level tracker stores the `VObj` instances by classes, and this is where `VObj` instances are created. For the default surface level tracker, different classes will be tracked separately using the ground level tracker. This level of tracker should generate the `track_id` field based on the provided detection result in this frame. Clearly, these trackers should be able to memorize historic detection results.
 
-To implement a customized method generating `track_id`, one should inherit `GroundTrackerBase` and register it to our backend. The interface of the ground level tracker is show below:
+Currently, we only support the customization of ground level tracker. Users should inherit the following `GroundTrackerBase` and register it to our backend using (TODO). The customized tracker takes the output of detector as input and generate the `track_id` field and possibly some other fields for each object. Then it should return two list of objects, one representing the current tracked objects, and one representing the tracklets we have currently lost, but might rediscover in the future.
 
 ```python
 class GroundTrackerBase(object):
@@ -186,10 +188,6 @@ class GroundTrackerBase(object):
         """
         ...
 ```
-
-For the registration details, please refer to our API document (TODO).
-
-There are also several interfaces for registering detector (`vqpy.detector.register`) and tracker (TODO) . For the detailed interface and usage, please refer to our API document (TODO).
 
 ## Examples
 
