@@ -84,5 +84,4 @@ if __name__ == '__main__':
                 tasks=[FallDetection()],
                 video_path=args.path,
                 save_folder=args.save_folder,
-                detector_name="yolox",
                 detector_model_dir=args.pretrained_model_dir)
