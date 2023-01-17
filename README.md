@@ -15,6 +15,22 @@ We have not supported installing VQPy automatically yet. You can follow the step
 pip3 install lap cython_bbox shapely
 ```
 
+VQPy uses [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX) as the default built-in object detection model.
+
+We need to install it from source. YOLOX requires PyTorch (version>=1.7) for pre-compiling ops, so please install it first.
+
+```
+git clone https://github.com/Megvii-BaseDetection/YOLOX.git
+cd YOLOX
+pip3 install -v -e .
+```
+
+The pretrained YOLOX model can be downloaded from [here](https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_x.pth).
+
+```
+wget https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_x.pth
+```
+
 #### Step 2: install VQPy from source
 
 First, clone vqpy repository from GitHub.
@@ -32,40 +48,6 @@ import vqpy
 ```
 
 ## Getting Started
-
-### Setup
-
-#### Install VQPy dependencies
-
-VQPy uses YOLOX as one of the built-in object detection models.
-
-To install YOLOX, we first need to install PyTorch (version>=1.7).
-
-Then install [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX") from source.
-
-```shell
-git clone https://github.com/Megvii-BaseDetection/YOLOX.git
-cd YOLOX
-pip3 install -v -e .
-```
-
-#### Install VQPy
-
-```shell
-pip3 install lap cython_bbox shapely
-```
-
-Download VQPy
-
-```shell
-git clone https://github.com/uclasystem/VQPy.git
-```
-
-VQPy is not yet available for installing as a package, please import `vqpy` from directory `VQPy/`. For example, add folder containing `vqpy` to `PYTHONPATH`:
-
-```shell
-export $PYTHONPATH=$PYTHONPATH:{/path/to/vqpy}
-```
 
 ### Basic usage
 
