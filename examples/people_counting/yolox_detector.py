@@ -28,7 +28,7 @@ class YOLOXDetector(DetectorBase):
         exp = get_exp(None, "yolox_x")
         exp.test_conf = 0.3
         exp.nmsthre = 0.3
-        exp.test_size = (640, 640)
+        exp.test_size = (480, 854)
 
         model = exp.get_model()
         model_info = get_model_info(model, exp.test_size)

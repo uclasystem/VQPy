@@ -52,3 +52,58 @@ def bottom_center_coordinate(obj, tlbr):
     x = (tlbr[0] + tlbr[2]) / 2
     y = tlbr[3]
     return [(x, y)]
+
+
+@vqpy_func_logger(['tlbr'], ['direction'], ['tlbr'], required_length=5)
+def direction(obj, tlbr):
+    """
+    The general direction computed with the past 5 historical frames.
+    There are 9 posible results:
+    "top", "topright", "right", "bottomright",
+    "bottom", "bottomleft", "left", "topleft",
+    and None, which means the vobj stays still in the past 5 frames.
+    """
+    def denoise(target, reference):
+        THRESHOLD = 10
+        if target != 0 and reference / target >= THRESHOLD:
+            target = 0
+        return target
+
+    def get_name(value, pos_name, neg_name):
+        if value > 0:
+            result = pos_name
+        elif value < 0:
+            result = neg_name
+        else:
+            result = ""
+        return result
+
+    def get_center(tlbr):
+        return (tlbr[:2] + tlbr[2:]) / 2
+
+    def most_frequent(List):
+        from collections import Counter
+        occurence_count = Counter(List)
+        return occurence_count.most_common(1)[0][0]
+
+    hist_len = 5
+    tlbr_past = [obj.getv("tlbr", (-1)*i) for i in range(1, 1 + hist_len)]
+    for value in tlbr_past:
+        if value is None:
+            return [None]
+
+    centers = list(map(get_center, tlbr_past))
+    diffs = [centers[i+1] - centers[i] for i in range(hist_len - 1)]
+
+    diff_xs = [denoise(diff[0], diff[1]) for diff in diffs]
+    diff_ys = [denoise(diff[1], diff[0]) for diff in diffs]
+
+    horizontal = most_frequent([get_name(diff_x, "right", "left")
+                                for diff_x in diff_xs])
+    vertical = most_frequent([get_name(diff_y, "bottom", "top")
+                              for diff_y in diff_ys])
+    direction = vertical + horizontal
+    if direction == "":
+        direction = None
+
+    return [direction]
