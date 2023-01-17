@@ -10,6 +10,8 @@ VQPy is still under active development. VQPy compiler, which generates a query p
 
 We have not supported installing VQPy automatically yet. You can follow the steps below to install VQPy manually.
 
+It is recommended to use Python 3.8 to avoid any compatibility issues with YOLOX.
+
 #### Step 1: install VQPy dependences
 ```
 pip3 install lap cython_bbox shapely
