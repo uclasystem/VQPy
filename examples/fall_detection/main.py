@@ -1,12 +1,15 @@
 import sys
+import os
 import vqpy
 
 import torch
 import numpy as np
 import argparse
 
-sys.path.append("VQPy/examples/fall_detection/detect/")
-# pose detection
+# importing pose detection models
+sys.path.append(
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), 'detect')
+)
 from PoseEstimateLoader import SPPE_FastPose  # noqa: E402
 from ActionsEstLoader import TSSTG  # noqa: E402
 
@@ -29,12 +32,9 @@ def make_parser():
 class Person(vqpy.VObjBase):
     required_fields = ['class_id', 'tlbr']
 
-    # note:
-    # model checkpoints are hard-coded in ActionsEstLoader.py and
-    # SPPE/src/main_fast_inference.py
-    # default values
-    pose_model = SPPE_FastPose('resnet50', 224, 160, device='cuda')
-    action_model = TSSTG()
+    # default values, to be assigned in main()
+    pose_model = None
+    action_model = None
 
     @vqpy.property()
     @vqpy.stateful(30)
@@ -79,9 +79,23 @@ class FallDetection(vqpy.QueryBase):
 
 if __name__ == '__main__':
     args = make_parser().parse_args()
-    vqpy.launch(cls_name=vqpy.COCO_CLASSES,
-                cls_type={"person": Person},
-                tasks=[FallDetection()],
-                video_path=args.path,
-                save_folder=args.save_folder,
-                detector_model_dir=args.pretrained_model_dir)
+    model_dir = args.pretrained_model_dir
+    pose_model = SPPE_FastPose(
+        'resnet50', 224, 160, device='cuda',
+        weights_file=os.path.join(
+            os.path.abspath(model_dir), "fast_res50_256x192.pth"
+        )
+    )
+    action_model = TSSTG(
+        weight_file=os.path.join(os.path.abspath(model_dir), "tsstg-model.pth")
+    )
+    Person.pose_model = pose_model
+    Person.action_model = action_model
+    vqpy.launch(
+        cls_name=vqpy.COCO_CLASSES,
+        cls_type={"person": Person},
+        tasks=[FallDetection()],
+        video_path=args.path,
+        save_folder=args.save_folder,
+        detector_model_dir=args.pretrained_model_dir
+    )
