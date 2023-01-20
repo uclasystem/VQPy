@@ -71,7 +71,7 @@ class FallDetection(vqpy.QueryBase):
         filter_cons = {'__class__': lambda x: x == Person,
                        'pose': lambda x: x == "Fall Down"}
         select_cons = {'track_id': None,
-                       'pose': None}
+                       'tlbr': lambda x: str(x)}
         return vqpy.VObjConstraint(filter_cons=filter_cons,
                                    select_cons=select_cons,
                                    filename='fall')
