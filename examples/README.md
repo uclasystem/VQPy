@@ -6,7 +6,6 @@
 - [Pedestrian Counting](count_person): count the number of pedestrians at the crosswalk.
 - [Detect people loitering](loitering): detect people loitering at specified region. [video](https://youtu.be/EuLMrUFNRxQ)
 - [Unattended baggage](unattended_baggage): detect baggage with people around. [video](https://www.kaggle.com/datasets/szahid405/baggage?select=baggage.mp4)
-- [Jupyter Notebook Demo](demo.ipynb): A Jupyter notebook containing the list red moving vehicle example.
 
 ## Running examples
 
