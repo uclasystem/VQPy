@@ -53,7 +53,9 @@ Also, we can see a builtin interface `infer` provided by the library in the firs
 
 There are two differences in the functions: `getv` can retrieve values in historic frames using `object.getv(property, index=)` if the property is marked by `@vqpy.stateful` decorator; `getv` consider user-defined names first and `infer` directly look up the library. Consequently, `infer` is mostly used when implementing the properties to avoid circular reference, and `getv` can be used as the interface to access the data within this object.
 
-We also have some other decorators to simplify the definition of properties, like `@vqpy.postproc`. This decorator provides basic postprocessing functions. For instance, returning the modal value of the results in past 10 frames. For more details on how to use the decorators, please refer to our API document (TODO). You can also refer to our [demos](https://github.com/uclasystem/VQPy/blob/main/README.md#customization) to see several example implementations of concerned objects.
+We also have some other decorators to simplify the definition of properties, like `@vqpy.postproc`, which provides basic postprocessing functions. For more details on how to use these decorators, please refer to our API document (TODO).
+
+You can also refer to our [demos](https://github.com/uclasystem/VQPy/blob/main/README.md#customization) to see several example implementations of concerned objects.
 
 #### Define a `Query`
 
@@ -118,6 +120,18 @@ vqpy.launch(cls_name=vqpy.COCO_CLASSES, # detection class
 ```
 
 Under the hood, VQPy will automatically select an object detection model that outputs the specified `cls_name`, and decide the workflow to generate the object properties. Multiple video optimizations will be conducted transparently to improve the end-to-end video query performance.
+
+## Examples
+
+We have included several examples for demonstrating VQPy.
+
+- [Fall Detection](examples/fall_detection): detect people in the video and recognize fallen person.
+- [List red moving vehicle](examples/list_red_moving_vehicle): show license plate of red moving vehicle.
+- [People Loitering](examples/loitering): count the number of person loitering around.
+- [People Counting](examples/people_counting): count the number of person heading both directions. 
+- [Unattended Baggage Detection](examples/unattended_baggage): detect unattended baggages.
+
+These examples can well demonstrate what VQPy can do and how to use VQPy.
 
 ### Customization
 
@@ -188,15 +202,3 @@ class GroundTrackerBase(object):
         """
         ...
 ```
-
-## Examples
-
-We have included several examples for demonstrating VQPy.
-
-- [Fall Detection](examples/fall_detection): detect people in the video and recognize fallen person.
-- [List red moving vehicle](examples/list_red_moving_vehicle): show license plate of red moving vehicle.
-- [People Loitering](examples/loitering): count the number of person loitering around.
-- [People Counting](examples/people_counting): count the number of person heading both directions. 
-- [Unattended Baggage Detection](examples/unattended_baggage): detect unattended baggages.
-
-These examples can well demonstrate what VQPy can do and how to use VQPy.
