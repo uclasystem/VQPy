@@ -1,1 +1,0 @@
-# VQPy Documentation

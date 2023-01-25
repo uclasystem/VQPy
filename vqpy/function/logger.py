@@ -19,7 +19,7 @@ def vqpy_func_logger(input_fields,
         output_fields: provided fields.
         past_fields: required fields in past frames.
         specifications: preference of the function.
-        required_length: the minimum track length for function to be useful.
+        required_length: the required track length for this function.
     """
     def decorator(func: Callable):
         @functools.wraps(func)
