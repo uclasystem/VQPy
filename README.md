@@ -12,7 +12,9 @@ VQPy is still under active development. VQPy compiler, which generates a query p
 
 In order to declare a video query with VQPy, users need to extend two classes defined in VQPy, namely `Query` and `VObj`. `VObj` defines the objects of interest (e.g., cars, humans, animals, etc.) in one or more video streams, and `Query` defines the video query. After declaration, the user can send the video feed and execution hints through the provided interface, and the backend will generate the execution plan and perform actual execution. The following graph illustrates the general structure of VQPy.
 
-![](docs/resources/vqpy.png)
+<div style="text-align: center">
+<img src="docs/resources/vqpy.png"/>
+</div>
 
 #### Define a `VObj`
 
@@ -184,7 +186,7 @@ class DetectorBase(object):
 
 There are two level of trackers in VQPy. The surface level tracker stores the `VObj` instances by classes, and this is where `VObj` instances are created. For the default surface level tracker, different classes will be tracked separately using the ground level tracker. This level of tracker should generate the `track_id` field based on the provided detection result in this frame. Clearly, these trackers should be able to memorize historic detection results.
 
-Currently, we only support the customization of ground level tracker. Users should inherit the following `GroundTrackerBase` and register it to our backend using (TODO). The customized tracker takes the output of detector as input and generate the `track_id` field and possibly some other fields for each object. Then it should return two list of objects, one representing the current tracked objects, and one representing the tracklets we have currently lost, but might rediscover in the future.
+Currently, we only support the customization of ground level tracker. Users should inherit the following `GroundTrackerBase` and register it to our backend using `vqpy.tracker.register(ground_tracker=)`. The customized tracker takes the output of detector as input and generate the `track_id` field and possibly some other fields for each object. Then it should return two list of objects, one representing the current tracked objects, and one representing the tracklets we have currently lost, but might rediscover in the future.
 
 ```python
 class GroundTrackerBase(object):
