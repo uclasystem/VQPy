@@ -4,6 +4,8 @@ This example demonstrates how to use VQPy to generate a query that returns the p
 ## Environment preparation
 You can follow the instructions [here](../../README.md#installation) to prepare your environment for VQPy.
 
+Pretrained onnx model for the specific car detector can be found [here](https://github.com/PINTO0309/PINTO_model_zoo/tree/main/276_HybridNets), the `hybridnets_384x512` model and anchors are used.
+
 Besides, please use below command to install other dependencies for this example.
 ```
 pip install webcolors ColorDetect opencv-python
